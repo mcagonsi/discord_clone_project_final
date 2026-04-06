@@ -1,120 +1,131 @@
-Tables (simple descriptions)
+# Database schema — Discord clone (descriptive draft)
+## Tables
 
-users
+### users
+- id (PK)
+- user_uid
+- display_name
+- username (unique)
+- email (unique)
+- password
+- created_at
+- status
 
-id (PK)
-useruid (UUID string)
-displayname
-username (unique)
-email (unique)
-password (hashed)
-created_at
-status (online/offline/idle)
-friends
+### friends
+- id (PK)
+- user_id (FK → users.id)
+- friend_user_id (FK → users.id)
+- accepted (boolean)
+- created_at
 
-id (PK)
-userid (FK -> users.id)
-friend_userid (FK -> users.id)
-accepted (boolean)
-created_at
-Notes: one row per friendship/request; unique pair constraint to avoid duplicates.
-blocked_users
+### blocked_users
+- id (PK)
+- user_id (FK → users.id)
+- blocked_user_id (FK → users.id)
+- created_at
 
-id (PK)
-userid (FK -> users.id)
-blocked_userid (FK -> users.id)
-created_at
-servers
+### servers
+- id (PK)
+- owner_id (FK → users.id)
+- name
+- description
+- type (enum: private/public)
+- invite_code
+- created_at
 
-id (PK)
-owner_id (FK -> users.id)
-name
-description
-type (private/public)
-invite_code (optional)
-created_at
-server_members
+### server_members
+- id (PK)
+- server_id (FK → servers.id)
+- user_id (FK → users.id)
+- joined_at
 
-id (PK)
-server_id (FK -> servers.id)
-user_id (FK -> users.id)
-joined_at
-Notes: unique (server_id, user_id)
-roles
+### roles
+- id (PK)
+- server_id (FK → servers.id)
+- name
+- created_by (FK → users.id)
+- created_at
 
-id (PK)
-server_id (FK -> servers.id)
-name
-created_by (FK -> users.id)
-created_at
-server_member_roles
+### server_member_roles
+- id (PK)
+- server_member_id (FK → server_members.id)
+- role_id (FK → roles.id)
 
-id (PK)
-server_member_id (FK -> server_members.id)
-role_id (FK -> roles.id)
-role_permissions
+### role_permissions
+- id (PK)
+- role_id (FK → roles.id)
+- permission_name
 
-id (PK)
-role_id (FK -> roles.id)
-permission_name (INVITE_USER, KICK_MEMBER, CREATE_CHANNEL, READ_CHANNEL, WRITE_CHANNEL, MANAGE_ROLES)
-channels
+### channels
+- id (PK)
+- server_id (FK → servers.id)
+- name
+- created_by (FK → users.id)
+- created_at
 
-id (PK)
-server_id (FK -> servers.id)
-name
-created_by (FK -> users.id)
-created_at
-channel_role_permissions
+### channel_role_permissions
+- id (PK)
+- channel_id (FK → channels.id)
+- role_id (FK → roles.id)
+- can_read (boolean)
+- can_write (boolean)
 
-id (PK)
-channel_id (FK -> channels.id)
-role_id (FK -> roles.id)
-can_read (boolean)
-can_write (boolean)
-server_messages
+### server_messages
+- id (PK)
+- channel_id (FK → channels.id)
+- user_id (FK → users.id)
+- content (text)
+- attachment_id (nullable, FK → server_message_attachment.id)
+- created_at
+- is_deleted (boolean)
 
-id (PK)
-channel_id (FK -> channels.id)
-userid (FK -> users.id)
-content (text)
-attachment_id (FK -> server_message_attachment.id, optional)
-created_at
-is_deleted (boolean)
-server_message_attachment
+### server_message_attachment
+- id (PK)
+- message_id (FK → server_messages.id)
+- file_name
+- file_path
+- uploaded_at
 
-id (PK)
-message_id (FK -> server_messages.id)
-file_name
-file_path (or URL)
-uploaded_at
-server_invites
+### server_invites
+- id (PK)
+- server_id (FK → servers.id)
+- invited_user_id (FK → users.id, nullable)
+- invited_by_user_id (FK → users.id)
+- accepted (boolean)
+- created_at
 
-id (PK)
-server_id (FK -> servers.id)
-invited_userid (FK -> users.id, optional)
-invitedby_userid (FK -> users.id, optional)
-accepted (boolean)
-created_at
-direct_chats
+### direct_chats
+- id (PK)
+- user_a_id (FK → users.id)
+- user_b_id (FK → users.id)
+- created_at
 
-id (PK)
-user_a (FK -> users.id)
-user_b (FK -> users.id)
-created_at
-Notes: store smaller user id first to enforce uniqueness
-direct_chat_messages
+### direct_chat_messages
+- id (PK)
+- conversation_id (FK → direct_chats.id)
+- sender_user_id (FK → users.id)
+- content (text)
+- attachment_id (nullable, FK → direct_chat_msg_attachment.id)
+- created_at
+- is_deleted (boolean)
 
-id (PK)
-conversation_id (FK -> direct_chats.id)
-sender_userid (FK -> users.id)
-content (text)
-attachment_id (FK -> direct_chat_msg_attachment.id, optional)
-created_at
-is_deleted (boolean)
-direct_chat_msg_attachment
+### direct_chat_msg_attachment
+- id (PK)
+- direct_chat_msg_id (FK → direct_chat_messages.id)
+- file_name
+- file_path
+- uploaded_at
 
-id (PK)
-direct_chat_msg_id (FK -> direct_chat_messages.id)
-file_name
-file_path (or URL)
-uploaded_at
+## ERD (high-level relationships)
+- Users → Servers (owner)
+- Users → ServerMembers → Servers
+- Servers → Channels → ServerMessages
+- Servers → Roles → RolePermissions
+- Channels ↔ RolePermissions (channel-level overrides)
+- Users → DirectChats → DirectChatMessages
+
+Notes:
+- Use indexes on FK columns and unique constraints for username/email.
+- Timestamps (created_at, uploaded_at) should use timezone-aware types if supported.
+- Boolean flags (accepted, is_deleted, can_read, can_write) can be tinyint(1) in MySQL.
+- Adjust nullable FK/attachment handling according to application needs.
