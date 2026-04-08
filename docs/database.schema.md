@@ -51,10 +51,23 @@
 - server_member_id (FK → server_members.id)
 - role_id (FK → roles.id)
 
+### permissions
+- id (PK)
+- name (unique)
+
+*Predefined values:*
+- INVITE_USER
+- KICK_USER
+- CREATE_CHANNEL
+- READ_CHANNEL
+- WRITE_CHANNEL
+- MANAGE
+
 ### role_permissions
 - id (PK)
 - role_id (FK → roles.id)
-- permission_name
+- permission_id (FK → permissions.id)
+- Constraint: UNIQUE(role_id, permission_id)
 
 ### channels
 - id (PK)
