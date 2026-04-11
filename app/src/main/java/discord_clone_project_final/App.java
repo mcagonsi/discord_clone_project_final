@@ -3,12 +3,50 @@
  */
 package discord_clone_project_final;
 
-public class App {
-    public String getGreeting() {
-        return "We are going to make a discord clone! This is the final project for our Java class.";
-    }
+import java.io.Serial;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import discord_clone_project_final.models.Permission;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+
+@Path("/discord")
+public class App {
+   private static final String DB_lookup = "java:/comp/env/jdbc/DiscordClone";
+    @Path("permissions")
+    @GET
+    @Produces("application/json")
+    public List<Permission> getPermissions() {
+        List<Permission> permissionList = new ArrayList<>();
+        try {
+            Context ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup(DB_lookup);
+            try (Connection conn = ds.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(
+                            "SELECT * from permissions; ");
+                    ResultSet rs = stmt.executeQuery();) {
+                while (rs.next()) {
+                    Permission permission = new Permission();
+                    permission.setId(rs.getInt("id"));
+                    permission.setName(rs.getString("name"));
+                    permissionList.add(permission);
+                }
+            }
+        } catch (NamingException | SQLException e) {
+            e.printStackTrace();
+        }
+        return permissionList;
     }
 }
