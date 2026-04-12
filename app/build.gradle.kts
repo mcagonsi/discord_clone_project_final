@@ -35,10 +35,7 @@ java {
     }
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = "discord_clone_project_final.App"
-}
+
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
