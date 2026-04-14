@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "discord_clone_client_project_final"
-include("app")
+include("discord-app")
