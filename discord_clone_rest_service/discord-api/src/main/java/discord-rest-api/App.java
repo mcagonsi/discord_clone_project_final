@@ -22,7 +22,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 
-@Path("/discord")
+@Path("/")
 public class App {
    private static final String DB_lookup = "java:/comp/env/jdbc/DiscordClone";
     @Path("permissions")

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+    <h:head>
+        <title>Groups and Friends</title>
+    </h:head>
+    <h:body>
+       <outputText value="Welcome to the Groups and Friends page!" />
+       <outputText value="Permissions testing"/>
+       <h:form>
+        <h:commandButton value="Fetch Permissions" action="#{permissionBean.getPermissions}" />
+       </h:form>
+    </h:body>
+</html>
