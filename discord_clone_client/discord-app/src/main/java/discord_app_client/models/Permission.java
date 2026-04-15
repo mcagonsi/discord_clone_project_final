@@ -1,4 +1,7 @@
+package discord_app_client.models;
+
 import java.io.Serializable;
+
 public class Permission  implements Serializable{
     private int id;
     private String name;

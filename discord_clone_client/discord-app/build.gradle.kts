@@ -25,6 +25,8 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
     implementation("org.apache.tomee:jakartaee-api:10.0.1")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
+    implementation("at.favre.lib:bcrypt:0.10.2")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
