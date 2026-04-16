@@ -15,7 +15,7 @@ CREATE TABLE users (
 
 -- Insert default admin user
 INSERT INTO users (user_uid, display_name, username, email, password, token, status, created_at) 
-VALUES ('admin-c9693', 'Juggernaut Team', 'admin', 'Juggernaut.dev@cna.nl.ca', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', '9f548315d0d986b1da4eb63679cbe2379adb5fa3d5a3174ecc0c73ffeaaee6c7', NULL, NOW());
+VALUES ('admin-c9693', 'Juggernaut Team', 'admin', 'Juggernaut.dev@cna.nl.ca', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', '9f548315d0d986b1da4eb63679cbe2379adb5fa3d5a3174ecc0c73ffeaaee6c7', 'offline', NOW());
 
 CREATE TABLE friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
