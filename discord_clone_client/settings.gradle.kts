@@ -10,5 +10,5 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "discord_clone_project_final"
-include("app")
+rootProject.name = "discord_clone_client_project_final"
+include("discord-app")

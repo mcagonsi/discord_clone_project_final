@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+    <h:head>
+        <title>Discord Clone Project</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+    </h:head>
+    <h:body>
+      
+            <div class="min-h-[40vh] bg-gray-50 flex items-center justify-center py-8">
+                <div class="w-full max-w-3xl mx-auto px-4">
+                    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-6">
+                        <h:outputText value="Welcome to the Groups and Friends page!" styleClass="text-2xl font-semibold text-gray-800 block" />
+                        <h:outputText value="Manage your groups, friends, and permissions from here." styleClass="mt-2 text-sm text-gray-500 block" />
+                        <div class="mt-4">
+                            <h:outputText value="Permissions testing" styleClass="text-sm text-gray-600 block" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+     
+       <h:form>
+        <h:commandButton styleClass="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" value="Fetch Permissions" action="#{permissionBean.getPermissions}" />
+       </h:form>
+    </h:body>
+</html>

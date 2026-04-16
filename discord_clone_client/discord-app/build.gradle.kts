@@ -7,7 +7,7 @@
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
-    java 
+    java
     war
 }
 
@@ -25,7 +25,6 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
     implementation("org.apache.tomee:jakartaee-api:10.0.1")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -35,10 +34,6 @@ java {
     }
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = "discord_clone_project_final.App"
-}
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
