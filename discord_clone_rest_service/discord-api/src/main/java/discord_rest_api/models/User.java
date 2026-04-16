@@ -9,6 +9,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
+    private byte[] passwordBytes;
     private String token;
     private String status;
     private String created_at;
@@ -73,5 +74,11 @@ public class User implements Serializable {
     }
     public void setCreated_at(String created_at) {
         this.created_at = created_at;
+    }
+    public byte[] getPasswordBytes() {
+        return passwordBytes;
+    }
+    public void setPasswordBytes(byte[] passwordBytes) {
+        this.passwordBytes = passwordBytes;
     }
 }

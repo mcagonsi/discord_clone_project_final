@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "discord_clone_client"
+		},
+		{
+			"path": "discord_clone_rest_service"
+		}
+	],
+	"settings": {}
+}
