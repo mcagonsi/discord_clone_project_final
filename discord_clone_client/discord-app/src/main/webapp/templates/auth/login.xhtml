@@ -5,7 +5,7 @@
       xmlns:f="jakarta.faces.core"
       xmlns:ui="jakarta.faces.facelets">
     <h:head>
-        <title>Discord by Juggernaut</title>
+        <title>Login - Discord Clone</title>
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
     </h:head>
@@ -30,7 +30,7 @@
                             </label>
                             <h:inputText 
                                 id="username"
-                                value="#{authBean.emailOrUsername}"
+                                value="#{authBean.user.username}"
                                 placeholder="Enter your username or email"
                                 styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
                                 />
@@ -43,21 +43,22 @@
                             </label>
                             <h:inputSecret 
                                 id="password"
-                                value="#{authBean.password}"
+                                value="#{authBean.user.password}"
                                 placeholder="Enter your password"
-                                redisplay="false"
                                 styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
                                 />
                         </div>
 
                         <!-- Error Messages -->
-                        
-                        <h:outputText value="#{authBean.message}" rendered="#{authBean.message != null}" styleClass="text-red-400 text-sm bg-red-900 bg-opacity-20 border border-red-700 rounded p-3 block" />
+                        <h:messages 
+                            styleClass="text-red-400 text-sm bg-red-900 bg-opacity-20 border border-red-700 rounded p-3"
+                            warnStyleClass="text-yellow-400 text-sm bg-yellow-900 bg-opacity-20 border border-yellow-700 rounded p-3"
+                            />
 
                         <!-- Login Button -->
                         <h:commandButton 
                             value="Login"
-                            action="#{authBean.loginUser}"
+                            action="#{authBean.login}"
                             styleClass="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mt-6"
                             />
 
@@ -80,7 +81,10 @@
                         </div>
                     </h:form>
 
-
+                    <!-- Forgot Password Link -->
+                    <div class="mt-6 text-center">
+                        <a href="#" class="text-gray-400 hover:text-gray-300 text-sm">Forgot your password?</a>
+                    </div>
                 </div>
 
                 <!-- Footer Info -->

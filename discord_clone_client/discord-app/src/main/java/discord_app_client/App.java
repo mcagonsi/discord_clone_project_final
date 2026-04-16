@@ -1,4 +1,4 @@
-package discord_clone_client_project_final;
+package discord_app_client;
 
 import java.io.Serializable;
 
