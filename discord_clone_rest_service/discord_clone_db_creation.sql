@@ -7,11 +7,15 @@ CREATE TABLE users (
     display_name VARCHAR(100),
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL, -- store hashed password
-    token CHAR(32), -- SHA-128 (32 hex chars)
+    password BINARY(60) NOT NULL, -- store hashed password (bcrypt)
+    token VARCHAR(64), -- JWT token
     status VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Insert default admin user
+INSERT INTO users (user_uid, display_name, username, email, password, token, status, created_at) 
+VALUES ('admin-c9693', 'Juggernaut Team', 'admin', 'Juggernaut.dev@cna.nl.ca', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', '9f548315d0d986b1da4eb63679cbe2379adb5fa3d5a3174ecc0c73ffeaaee6c7', 'offline', NOW());
 
 CREATE TABLE friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -202,3 +206,35 @@ CREATE TABLE direct_chat_msg_attachment (
 
     FOREIGN KEY (direct_chat_msg_id) REFERENCES direct_chat_messages(id) ON DELETE CASCADE
 );
+
+-- Trigger to automatically create "general" channel, "everyone" role, and add owner to server_members when a new server is created
+DELIMITER //
+
+CREATE TRIGGER create_default_server_setup AFTER INSERT ON servers
+FOR EACH ROW
+BEGIN
+    DECLARE v_channel_id INT;
+    DECLARE v_role_id INT;
+    
+    -- Insert owner into server_members
+    INSERT INTO server_members (server_id, user_id)
+    VALUES (NEW.id, NEW.owner_id);
+    
+    -- Create "general" channel
+    INSERT INTO channels (server_id, name, created_by)
+    VALUES (NEW.id, 'general', NEW.owner_id);
+    
+    SET v_channel_id = LAST_INSERT_ID();
+    
+    -- Create "everyone" role
+    INSERT INTO roles (server_id, name, created_by)
+    VALUES (NEW.id, 'everyone', NEW.owner_id);
+    
+    SET v_role_id = LAST_INSERT_ID();
+    
+    -- Add "everyone" role permissions to "general" channel
+    INSERT INTO channel_role_permissions (channel_id, role_id, can_read, can_write)
+    VALUES (v_channel_id, v_role_id, TRUE, TRUE);
+END //
+
+DELIMITER ;

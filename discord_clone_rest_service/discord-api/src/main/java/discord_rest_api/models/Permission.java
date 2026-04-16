@@ -1,4 +1,4 @@
-package discord_clone_project_final.models;
+package discord_rest_api.models;
 
 import java.io.Serializable;
 
@@ -6,6 +6,13 @@ public class Permission implements Serializable {
     
     private int id;
     private  String name;
+
+    public static Permission makePermission(int id, String name) {
+        Permission permission = new Permission();
+        permission.setId(id);
+        permission.setName(name);
+        return permission;
+    }
 
     public int getId() {
         return id;
