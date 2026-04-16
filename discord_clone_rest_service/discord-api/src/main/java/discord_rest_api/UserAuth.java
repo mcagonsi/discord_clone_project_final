@@ -192,7 +192,7 @@ public class UserAuth implements Serializable {
     @Path("/login")
     @Consumes("application/json")
     @Produces("application/json")
-    public HashMap<String, Object> Login(User user) {
+    public HashMap<String, Object> login(User user) {
         HashMap<String, Object> response = new HashMap<>();
         // check if the input is an email or username
         User existingUser = null;
