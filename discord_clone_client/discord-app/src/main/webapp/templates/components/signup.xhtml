@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="jakarta.faces.html"
+  xmlns:f="jakarta.faces.core"
+  xmlns:ui="jakarta.faces.facelets"
+>
+  <!-- Signup Card -->
+  <div class="bg-gray-800 rounded-lg shadow-2xl p-8 border border-gray-700">
+    <h2 class="text-2xl font-bold text-white mb-6">Create Account</h2>
+
+    <h:form styleClass="space-y-4">
+      <!-- Display Name Field -->
+      <div>
+        <label
+          for="displayName"
+          class="block text-sm font-medium text-gray-200 mb-2"
+        >
+          Display Name
+        </label>
+        <h:inputText
+          id="displayName"
+          value="#{authBean.user.display_name}"
+          placeholder="Enter your display name"
+          styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Username Field -->
+      <div>
+        <label
+          for="username"
+          class="block text-sm font-medium text-gray-200 mb-2"
+        >
+          Username
+        </label>
+        <h:inputText
+          id="username"
+          value="#{authBean.user.username}"
+          placeholder="Enter your username"
+          styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-200 mb-2">
+          Email
+        </label>
+        <h:inputText
+          id="email"
+          value="#{authBean.user.email}"
+          placeholder="Enter your email"
+          styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-200 mb-2"
+        >
+          Password
+        </label>
+        <h:inputSecret
+          id="password"
+          value="#{authBean.user.password}"
+          placeholder="Enter your password"
+          redisplay="false"
+          styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div>
+        <label
+          for="confirmPassword"
+          class="block text-sm font-medium text-gray-200 mb-2"
+        >
+          Confirm Password
+        </label>
+        <h:inputSecret
+          id="confirmPassword"
+          placeholder="Confirm your password"
+          redisplay="false"
+          styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+        />
+      </div>
+
+      <!-- Error Messages -->
+      <h:outputText
+        value="#{authBean.message}"
+        rendered="#{authBean.message != null}"
+        styleClass="text-red-400 text-sm bg-red-900 bg-opacity-20 border border-red-700 rounded p-3 block"
+      />
+
+      <!-- Signup Button -->
+      <h:commandButton
+        value="Sign Up"
+        action="#{authBean.registerUser}"
+        styleClass="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mt-6"
+      />
+    </h:form>
+  </div>
+</html>

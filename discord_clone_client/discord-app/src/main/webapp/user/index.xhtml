@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <h:head>
+        <title>Dashboard - Discord Clone</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </h:head>
+    
+    <h:body>
+        <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-black flex items-center justify-center px-4 py-8">
+            <div class="w-full max-w-md">
+                <!-- Welcome Card -->
+                <div class="bg-gray-800 rounded-lg shadow-2xl p-12 border border-gray-700 text-center">
+                    <!-- Icon -->
+                    <div class="mb-6">
+                        <div class="inline-block bg-indigo-600 rounded-full p-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h-2m0 0H8m4 0v2m0-2V8m0 4h2m0 0v2m0-2v-2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Message -->
+                    <h1 class="text-4xl font-bold text-white mb-2">Welcome Back!</h1>
+                    <p class="text-gray-300 text-lg mb-8">You have successfully logged in</p>
+
+                    <!-- User Info -->
+                    <div class="bg-gray-700 rounded-lg p-4 mb-8">
+                        <p class="text-gray-300 text-sm mb-2">Logged in as:</p>
+                        <p class="text-white text-xl font-semibold">
+                            <h:outputText value="#{authBean.loggedUser.display_name}" />
+                        </p>
+                        <p class="text-gray-400 text-sm mt-2">
+                            @<h:outputText value="#{authBean.loggedUser.username}" />
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <h:form styleClass="w-full">
+                            <h:commandButton 
+                                value="Go to Dashboard"
+                                styleClass="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
+                                />
+                        </h:form>
+
+                        <h:form styleClass="w-full">
+                            <h:commandButton 
+                                value="Logout"
+                                action="#{authBean.logout}"
+                                styleClass="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200"
+                                />
+                        </h:form>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 text-center text-gray-400 text-xs">
+                    <p>© 2026 Discord Clone - Team Juggernaut</p>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>
