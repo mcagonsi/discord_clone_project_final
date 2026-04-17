@@ -17,6 +17,15 @@ CREATE TABLE users (
 INSERT INTO users (user_uid, display_name, username, email, password, token, status, created_at) 
 VALUES ('admin-c9693', 'Juggernaut Team', 'admin', 'Juggernaut.dev@cna.nl.ca', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', '9f548315d0d986b1da4eb63679cbe2379adb5fa3d5a3174ecc0c73ffeaaee6c7', 'offline', NOW());
 
+-- Insert 3 random test users
+INSERT INTO users (user_uid, display_name, username, email, password, status, created_at) 
+VALUES 
+('user-a1b2c', 'John Developer', 'johndeveloper', 'john@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW()),
+('user-d3e4f', 'Sarah Engineer', 'sarahengineer', 'sarah@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW()),
+('user-g5h6i', 'Mike Designer', 'mikedesigner', 'mike@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW());
+
+
+
 CREATE TABLE friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -29,6 +38,19 @@ CREATE TABLE friends (
 
     UNIQUE (user_id, friend_user_id)
 );
+
+-- Insert friend requests: Admin sends 3 requests
+-- Admin (id=1) to John (id=2) - ACCEPTED
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 2, TRUE, NOW());
+
+-- Admin (id=1) to Sarah (id=3) - ACCEPTED
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 3, TRUE, NOW());
+
+-- Admin (id=1) to Mike (id=4) - PENDING (not accepted)
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 4, FALSE, NOW());
 
 CREATE TABLE blocked_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +69,7 @@ CREATE TABLE servers (
     owner_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    type ENUM('private', 'public') NOT NULL,
+    isPublic TINYINT NOT NULL DEFAULT 1,
     invite_code VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
