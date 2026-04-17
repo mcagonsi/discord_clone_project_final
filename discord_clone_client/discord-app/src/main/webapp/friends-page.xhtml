@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+    <h:head>
+        <title>Discord Clone Project</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+    </h:head>
+    <h:body class="flex left-0 top-0 h-screen w-[200px] p-3">
+        <div class="flex flex-1 items-start gap-6">
+            <ui:include src="/WEB-INF/includes/main_user_menu.xhtml" />
+        </div>
+        <div class="flex justify-center">
+            <h:panelGroup id="FriendsPage" class="flex items-center justify-center">
+                <div class="flex flex-row gap-2">
+                    <h:commandButton value="Add Friend" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-4 py-2 inline-flex items-center justify-center max-w-[150px] hover:cursor-pointer" />
+                    <h:commandButton value="Block User by ID" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-4 py-2 inline-flex items-center justify-center max-w-[150px] hover:cursor-pointer" />
+                </div>
+            </h:panelGroup>
+        </div>
+    </h:body>
+</html>
