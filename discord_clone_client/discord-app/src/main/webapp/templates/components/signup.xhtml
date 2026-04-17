@@ -84,6 +84,7 @@
         <h:inputSecret
           id="confirmPassword"
           placeholder="Confirm your password"
+          value="#{authBean.confirmPassword}"
           redisplay="false"
           styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
         />
@@ -93,7 +94,7 @@
       <h:outputText
         value="#{authBean.message}"
         rendered="#{authBean.message != null}"
-        styleClass="text-red-400 text-sm bg-red-900 bg-opacity-20 border border-red-700 rounded p-3 block"
+        styleClass="text-white text-sm bg-white-900 bg-opacity-20 border border-gray-700 rounded p-3 block"
       />
 
       <!-- Signup Button -->

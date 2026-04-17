@@ -98,6 +98,7 @@ public class AuthBean implements Serializable {
                 System.out.println(response.get("message").toString());
                 message = null; // Clear any previous messages on successful login
                 redirect = "redirect:../../user/index.xhtml?faces-redirect=true";
+               
             } else {
                 message = response.get("message").toString();
             }
@@ -107,43 +108,56 @@ public class AuthBean implements Serializable {
             redirect = null;
             
         }
+        
 
        return redirect;
     }
 
-    public void registerUser() {
+    public String registerUser() {
        
         if (user.getDisplay_name() == null || user.getUsername() == null || user.getEmail() == null
                 || user.getPassword() == null) {
             message = "All fields are required for registration.";
-            user = new User(); // Reset user to clear any partial data
-            return; 
+            return null; 
         }
         if (user.getDisplay_name().isEmpty() || user.getUsername().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty()) {
             message = "All fields must be filled out for registration.";
-            user = new User(); // Reset user to clear any partial data
-            return;
+            return null;
         }
-        if (user.getPassword() != null && !user.getPassword().equals(confirmPassword)) {
+        
+        // Check if passwords match BEFORE trimming
+        System.out.println("Password: '" + user.getPassword() + "'");
+        System.out.println("Confirm Password: '" + confirmPassword + "'");
+        
+        if (confirmPassword == null || confirmPassword.isEmpty()) {
+            message = "Please confirm your password.";
+            return null;
+        }
+        
+        if (!user.getPassword().equals(confirmPassword)) {
             message = "Password and Confirm Password do not match.";
-            user = new User(); // Reset user to clear any partial data
-            return;
+            return null;
         }
+        
         try {
             HashMap<String, Object> response = base.path("auth/signup").request(MediaType.APPLICATION_JSON)
                     .post(Entity.json(user), HashMap.class);
             System.out.println("Registration response: " + response);
             message = response.get("message").toString();
+            
+            user = new User(); // Clear registration form
+            password = null; // Clear password field after attempt
+            confirmPassword = null; // Clear confirm password field after attempt
             authType = "login"; // Switch to login view after successful registration
+            
+            return "redirect:/index.xhtml?faces-redirect=true"; // Return navigation outcome
             
         } catch (Exception e) {
             System.out.println("Registration failed: " + e.getMessage());
             message = "Registration failed: " + e.getMessage();
-            return;
-            
+            e.printStackTrace();
+            return null;
         }
-
-        
     }
 
     public String getEmailOrUsername() {
@@ -165,6 +179,7 @@ public class AuthBean implements Serializable {
     public String getMessage() {
         return message;
     }
+
 
     public String getAuthType() {
         return authType;
@@ -190,6 +205,22 @@ public class AuthBean implements Serializable {
     public void showSignup() {
         this.authType = "signup";
         this.message = null; // Clear any previous messages
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    
+    public void setLoggedUser(User loggedUser) {
+        this.loggedUser = loggedUser;
     }
 
     // for now 
