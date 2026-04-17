@@ -7,13 +7,6 @@ public class Permission implements Serializable {
     private int id;
     private  String name;
 
-    public static Permission makePermission(int id, String name) {
-        Permission permission = new Permission();
-        permission.setId(id);
-        permission.setName(name);
-        return permission;
-    }
-
     public int getId() {
         return id;
     }
