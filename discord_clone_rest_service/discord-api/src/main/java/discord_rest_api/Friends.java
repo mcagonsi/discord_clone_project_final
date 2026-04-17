@@ -162,6 +162,7 @@ public class Friends {
         return response;
     }
 
+    //TODO: Maybe make this go both ways?
     @POST
     @Path("acceptRequest")
     @Produces("application/json")
@@ -203,5 +204,38 @@ public class Friends {
         }
         return response;
     }
-    
+
+    @POST
+    @Path("incomingRequests")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> viewIncomingRequests(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        List<User> requests = new ArrayList<User>();
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM friends WHERE friend_user_id=?;"
+            )
+        ) {
+            stmt.setInt(1, user.getId());
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                while (rs.next()) {
+                    User invite = getUserFromId(rs.getInt("user_id"));
+                    if (invite != null) {
+                        requests.add(invite);
+                    }
+                }
+                response.put("requests", requests);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
 }
