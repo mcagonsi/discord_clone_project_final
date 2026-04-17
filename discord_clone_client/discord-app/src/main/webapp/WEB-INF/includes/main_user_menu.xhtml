@@ -1,0 +1,23 @@
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+        <title>Basic User Menu</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+
+        <h:panelGroup id="menu" layout="block" class="pl-3">
+
+            <h:commandButton value="View Friends List" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
+
+            <h:commandButton value="View Server List" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
+
+            <h:commandButton value="Join Server" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer" />
+
+            <h:commandButton value="Create Server" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer" />
+
+        </h:panelGroup>
+
+</ui:composition>
