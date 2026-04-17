@@ -1,31 +1,38 @@
-<!DOCTYPE html>
-<html lang="en"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:ui="jakarta.faces.facelets">
-    <h:head>
-        <title>Discord Clone Project</title>
-        <!-- Tailwind CDN -->
-        <script src="https://cdn.tailwindcss.com"></script>
+<!-- index.xhtml -->
+<ui:composition
+  template="templates/layout.xhtml"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="jakarta.faces.core"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
+  <h:head>
+    <title>Welcome to Discord - Team Juggernaut</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </h:head>
+  <ui:define name="content">
+    <f:event type="preRenderView" listener="#{authBean.checkLoginStatus}" />
+    <h:form styleClass="flex gap-4 mb-8">
+      <h:commandButton
+        value="Login"
+        action="#{authBean.showLogin}"
+        styleClass="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 transform hover:scale-105 active:scale-95 shadow-lg"
+      />
 
-    </h:head>
-    <h:body>
-      
-            <div class="min-h-[40vh] bg-gray-50 flex items-center justify-center py-8">
-                <div class="w-full max-w-3xl mx-auto px-4">
-                    <div class="bg-white border border-gray-200 shadow-sm rounded-lg p-6">
-                        <h:outputText value="Welcome to the Groups and Friends page!" styleClass="text-2xl font-semibold text-gray-800 block" />
-                        <h:outputText value="Manage your groups, friends, and permissions from here." styleClass="mt-2 text-sm text-gray-500 block" />
-                        <div class="mt-4">
-                            <h:outputText value="Permissions testing" styleClass="text-sm text-gray-600 block" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-     
-       <h:form>
-        <h:commandButton styleClass="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" value="Fetch Permissions" action="#{permissionBean.getPermissions}" />
-       </h:form>
-    </h:body>
-</html>
+      <h:commandButton
+        value="Signup"
+        action="#{authBean.showSignup}"
+        styleClass="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 transform hover:scale-105 active:scale-95 shadow-lg"
+      />
+    </h:form>
+
+  
+    <h:panelGroup rendered="#{authBean.authType == 'login'}">
+      <ui:include src="templates/components/login.xhtml" />
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{authBean.authType == 'signup'}">
+      <ui:include src="templates/components/signup.xhtml" />
+    </h:panelGroup>
+  </ui:define>
+</ui:composition>

@@ -109,7 +109,6 @@ public class UserAuth implements Serializable {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     User updatedUser = new User();
-                    updatedUser.setId(rs.getInt("id"));
                     updatedUser.setUid(rs.getString("user_uid"));
                     updatedUser.setDisplay_name(rs.getString("display_name"));
                     updatedUser.setUsername(rs.getString("username"));
@@ -135,6 +134,16 @@ public class UserAuth implements Serializable {
         HashMap<String, Object> response = new HashMap<>();
 
         System.out.println("Signup endpoint called for user: " + user);
+        if (user.getDisplay_name() == null || user.getDisplay_name().isEmpty()) {
+            System.out.println("Display name is required for signup.");
+            response.put("message", "Display name is required.");
+            return response;
+        }
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            System.out.println("Username is required for signup.");
+            response.put("message", "Username is required.");
+            return response;
+        }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             System.out.println("Email is required for signup.");
             response.put("message", "Email is required.");
@@ -148,11 +157,6 @@ public class UserAuth implements Serializable {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             System.out.println("Password is required for signup.");
             response.put("message", "Password is required.");
-            return response;
-        }
-        if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            System.out.println("Username is required for signup.");
-            response.put("message", "Username is required.");
             return response;
         }
 
@@ -170,7 +174,7 @@ public class UserAuth implements Serializable {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("User signed up successfully: " + user.getUsername());
-                message = "User signed up successfully.";
+                message = "User signed up successfully. Please sign in to continue.";
                 response.put("message", message);
 
             } else {
