@@ -13,6 +13,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import discord_app_client.models.*;
+import discord_app_client.utils.Variables;
 
 
 @Named("authBean")
@@ -26,6 +27,7 @@ public class AuthBean implements Serializable {
     private Client client;
     private WebTarget base;
     private String message;
+    private String confirmPassword;
 
     @PostConstruct
     public void init() {
@@ -33,7 +35,7 @@ public class AuthBean implements Serializable {
             user = new User();
         }
         client = ClientBuilder.newClient();
-        base = client.target("http://localhost:8080/discord-api");
+        base = client.target(Variables.API_URL);
     }
 
     @PreDestroy
@@ -47,7 +49,7 @@ public class AuthBean implements Serializable {
 
         if (emailOrUsername == null || password == null) {
             System.out.println("Email/Username and password must not be null");
-            return;
+            message = "Email/Username and password are required.";
         }
         System.out.println("Attempting to log in with: " + emailOrUsername);
         // Set either email or username based on the input and also set the password
@@ -88,10 +90,23 @@ public class AuthBean implements Serializable {
     }
 
     public void registerUser() {
-        // Implement registration logic using base WebTarget
-        // Example: token =
-        // base.path("auth/register").request(MediaType.APPLICATION_JSON).post(Entity.json(user),
-        // String.class);
+
+        if(user.getDisplay_name() == null || user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
+            message = "All fields are required for registration.";
+            
+        }
+        if(user.getPassword() != null && !user.getPassword().equals(confirmPassword)) {
+            message = "Password and Confirm Password do not match.";
+            
+        }
+            try {
+                HashMap<String,Object> response = base.path("auth/signup").request(MediaType.APPLICATION_JSON).post(Entity.json(user), HashMap.class);
+                System.out.println("Registration response: " + response);
+                message = response.get("message").toString();
+            } catch (Exception e) {
+                System.out.println("Registration failed: " + e.getMessage());
+                message = "Registration failed: " + e.getMessage();
+            }
     }
 
     public String getEmailOrUsername() {
@@ -113,5 +128,22 @@ public class AuthBean implements Serializable {
     public String getMessage() {
         return message;
     }
+
+    public String getAuthType() {
+        return authType;
+    }
+    
+     public void setAuthType(String authType) {
+        this.authType = authType;
+    }
+
+     public User getUser() {
+        return user;
+     }
+
+     public void setUser(User user) {
+        this.user = user;
+     }
+
 
 }
