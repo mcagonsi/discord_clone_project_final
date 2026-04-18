@@ -6,6 +6,7 @@ public class Message {
     private int authorId;
     private String content;
     private String createdAt;
+    private MsgAttachment attachment;
 
     // Getters and Setters
     public int getId() {
@@ -46,5 +47,13 @@ public class Message {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public MsgAttachment getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(MsgAttachment attachment) {
+        this.attachment = attachment;
     }
 }

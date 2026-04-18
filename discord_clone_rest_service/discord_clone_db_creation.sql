@@ -193,18 +193,22 @@ CREATE TABLE server_invites (
     FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE,
     FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE CASCADE
+    ,
+    UNIQUE (server_id, invited_user_id, invited_by_user_id)
 );
 
 CREATE TABLE direct_chats (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_a_id INT NOT NULL,
-    user_b_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    user_a_id INT AS (LEAST(sender_id, receiver_id)) STORED,
+    user_b_id INT AS (GREATEST(sender_id, receiver_id)) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_a_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_b_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
 
-    UNIQUE (user_a_id, user_b_id)
+    UNIQUE KEY uniq_direct_pair (user_a_id, user_b_id)
 );
 
 CREATE TABLE direct_chat_messages (
