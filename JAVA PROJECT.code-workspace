@@ -7,5 +7,7 @@
 			"path": "discord_clone_rest_service"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
 }
