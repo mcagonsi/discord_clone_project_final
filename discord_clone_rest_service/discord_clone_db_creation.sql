@@ -119,8 +119,8 @@ INSERT INTO permissions (name) VALUES
 ('INVITE_USER'),
 ('KICK_USER'),
 ('CREATE_CHANNEL'),
-('READ_CHANNEL'),
-('WRITE_CHANNEL'),
+-- ('READ_CHANNEL'),
+-- ('WRITE_CHANNEL'),
 ('MANAGE_ROLES');
 
 CREATE TABLE role_permissions (
@@ -241,10 +241,14 @@ FOR EACH ROW
 BEGIN
     DECLARE v_channel_id INT;
     DECLARE v_role_id INT;
+    DECLARE v_server_member_id INT;
     
     -- Insert owner into server_members
     INSERT INTO server_members (server_id, user_id)
     VALUES (NEW.id, NEW.owner_id);
+
+    -- capture the server_member id for assigning roles
+    SET v_server_member_id = LAST_INSERT_ID();
     
     -- Create "general" channel
     INSERT INTO channels (server_id, name, created_by)
@@ -261,6 +265,32 @@ BEGIN
     -- Add "everyone" role permissions to "general" channel
     INSERT INTO channel_role_permissions (channel_id, role_id, can_read, can_write)
     VALUES (v_channel_id, v_role_id, TRUE, TRUE);
+
+    -- Assign the "everyone" role to the owner (the owner was inserted earlier into server_members)
+    -- Use INSERT IGNORE to avoid duplicate-key errors in case of unexpected duplicates
+    INSERT IGNORE INTO server_member_roles (server_member_id, role_id)
+    VALUES (v_server_member_id, v_role_id);
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- Trigger to automatically assign the "everyone" role to any newly added server member
+CREATE TRIGGER assign_everyone_role_after_member_insert AFTER INSERT ON server_members
+FOR EACH ROW
+BEGIN
+    DECLARE v_everyone_role_id INT;
+    -- Try to find the "everyone" role for the server
+    SELECT id INTO v_everyone_role_id FROM roles WHERE server_id = NEW.server_id AND name = 'everyone' LIMIT 1;
+
+    -- Only assign the role if it already exists. Do NOT create a role here —
+    -- create_default_server_setup is responsible for creating the "everyone" role when a server is created.
+    IF v_everyone_role_id IS NOT NULL THEN
+        -- Assign the everyone role to the newly created server_member. Use INSERT IGNORE to avoid duplicate-key errors.
+        INSERT IGNORE INTO server_member_roles (server_member_id, role_id) VALUES (NEW.id, v_everyone_role_id);
+    END IF;
 END //
 
 DELIMITER ;

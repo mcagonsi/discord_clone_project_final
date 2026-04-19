@@ -4,15 +4,20 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import discord_rest_api.models.DirectChat;
+import discord_rest_api.models.Permission;
+import discord_rest_api.models.Role;
 import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
 import discord_rest_api.utils.InviteCodeGenerator;
+import discord_rest_api.utils.PermissionConst;
 import jakarta.ws.rs.*;
-import jakarta.websocket.server.PathParam;
 
 @Path("/servers")
 public class ServerResource implements Serializable {
@@ -102,70 +107,102 @@ public class ServerResource implements Serializable {
         return null; // Placeholder return statement
     }
 
-    public boolean validateToken(User user, String token) {
-        if (user == null || token == null) {
-            return false;
-        }
-        return user.getToken().equals(token);
-    }
-
     private boolean sendInviteDirectMessage(User sender, User receiver, String serverId) {
         // robust serverId parse
-        Server  server = getServerById(Integer.parseInt(serverId));
+        Server server = getServerById(Integer.parseInt(serverId));
+        int conversation_id = DirectChat.getConversationId(sender, receiver);
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            int a = Math.min(sender.getId(), receiver.getId());
-            int b = Math.max(sender.getId(), receiver.getId());
-            int conversation_id = -1;
-
-            // find existing conversation using ordered pair
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT id FROM direct_chats WHERE LEAST(sender_id, receiver_id) = ? AND GREATEST(sender_id, receiver_id) = ?")) {
-                stmt.setInt(1, a);
-                stmt.setInt(2, b);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        conversation_id = rs.getInt("id");
-                    }
+        // send message if we have a conversation id
+        if (conversation_id != -1) {
+            try (Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement msgStmt = conn.prepareStatement(
+                            "INSERT INTO direct_chat_messages (conversation_id, sender_user_id, content) VALUES (?, ?, ?)");) {
+                msgStmt.setInt(1, conversation_id);
+                msgStmt.setInt(2, sender.getId());
+                msgStmt.setString(3, "Server Invite. Server Name: " + server.getName()
+                        + ", Invite Code: " + server.getInviteCode());
+                int msgRowsAffected = msgStmt.executeUpdate();
+                if (msgRowsAffected > 0) {
+                    System.out.println("Direct chat message sent successfully!");
+                    return true;
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private boolean checkInvitePermissions(User user, Server server) {
+        boolean hasPermission = false;
+        if (user != null && server != null) {
+            // Example logic: check if the user is the owner of the server
+            if (user.getId() == server.getOwnerId()) {
+                return true;
             }
 
-            // create conversation if needed (return generated key)
-            if (conversation_id == -1) {
-                try (PreparedStatement createStmt = conn.prepareStatement(
-                        "INSERT INTO direct_chats (sender_id, receiver_id) VALUES (?, ?)",
-                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                    createStmt.setInt(1, a);
-                    createStmt.setInt(2, b);
-                    int rowsAffected = createStmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                        try (ResultSet keys = createStmt.getGeneratedKeys()) {
-                            if (keys.next()) {
-                                conversation_id = keys.getInt(1);
+            int servermemberId = -1;
+            try (Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn
+                            .prepareStatement("SELECT id FROM server_members WHERE user_id = ? AND server_id = ?")) {
+                stmt.setInt(1, user.getId());
+                stmt.setInt(2, server.getId());
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    // Found the user as a member of the server
+                    System.out.println("User found as member of the server" + rs.getInt("id"));
+                    servermemberId = rs.getInt("id");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (servermemberId != -1) {
+                List<Role> userRoles = new ArrayList<>();
+                try (Connection conn = DatabaseConnection.getConnection();
+                        PreparedStatement stmt = conn.prepareStatement(
+                                "SELECT r.id, r.name FROM roles r JOIN server_member_roles smr ON r.id = smr.role_id WHERE smr.server_member_id = ?")) {
+                    stmt.setInt(1, servermemberId);
+                    ResultSet rs = stmt.executeQuery();
+                    while (rs.next()) {
+
+                        Role role = new Role();
+                        role.setId(rs.getInt("id"));
+                        role.setName(rs.getString("name"));
+
+                        try (PreparedStatement smrStmt = conn.prepareStatement(
+                                "SELECT p.id, p.name FROM permissions p JOIN role_permissions rp ON p.id = rp.permission_id WHERE rp.role_id = ?")) {
+                            smrStmt.setInt(1, role.getId());
+                            ResultSet permRs = smrStmt.executeQuery();
+                            while (permRs.next()) {
+                                Permission permission = new Permission();
+                                permission.setId(permRs.getInt("id"));
+                                permission.setName(permRs.getString("name"));
+                                role.permissions.add(permission);
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        userRoles.add(role);
+                    }
+
+                    for (Role role : userRoles) {
+                        System.out.println("User has role: " + role.getName());
+                        for (Permission permission : role.permissions) {
+                            System.out.println(" - " + permission.getName());
+                            if (permission.getName().equals(PermissionConst.INVITE_USER)) {
+                                hasPermission = true;
                             }
                         }
                     }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    hasPermission = false;
                 }
             }
 
-            // send message if we have a conversation id
-            if (conversation_id != -1) {
-                try (PreparedStatement msgStmt = conn.prepareStatement(
-                        "INSERT INTO direct_chat_messages (conversation_id, sender_user_id, content) VALUES (?, ?, ?)")) {
-                    msgStmt.setInt(1, conversation_id);
-                    msgStmt.setInt(2, sender.getId());
-                    msgStmt.setString(3, "I am inviting you to join my server. Server Name: " + server.getName() + ", Invite Code: " + server.getInviteCode());
-                    int msgRowsAffected = msgStmt.executeUpdate();
-                    if (msgRowsAffected > 0) {
-                        System.out.println("Direct chat message sent successfully!");
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return false;
+
+        return hasPermission; // Return the permission status
     }
 
     @POST
@@ -182,7 +219,7 @@ public class ServerResource implements Serializable {
             System.out.println("User not found for user_uid: " + user_uid);
             return;
         }
-        if (!validateToken(owner, token)) {
+        if (!User.isValidUser(owner, token)) {
             System.out.println("Invalid token for user_uid: " + user_uid);
             return;
         }
@@ -261,8 +298,11 @@ public class ServerResource implements Serializable {
     @Consumes("application/json")
     @Produces("application/json")
     public HashMap<String, Object> sendServerInvite(HashMap<String, Object> JSON) {
+        // payload comes with serverid, invitedUser, and invitedBy, the invitedBy comes
+        // with uid and token
         String serverId = (String) JSON.get("serverId");
         String invitedUsername = (String) JSON.get("invitedUser");
+
         HashMap<String, Object> invitedBy = (HashMap<String, Object>) JSON.get("invitedBy");
         String invitedByUid = (String) invitedBy.get("uid");
         String invitedByToken = (String) invitedBy.get("token"); // use this to validate user
@@ -270,16 +310,22 @@ public class ServerResource implements Serializable {
         User invitedUser = getUserByUsername(invitedUsername);
         User invitedByUser = getUserFromUid(invitedByUid);
 
+        Server server = getServerById(Integer.parseInt(serverId));
+
         HashMap<String, Object> response = new HashMap<>();
-        boolean makesuretocheckpermissions = true; // to check if the invited by is the owner or the invited by has
-                                                   // invite permissions for that server also check valid token
-        System.out.println("Invited User: " + invitedUser.getUsername());
-        System.out.println("Invited By: " + invitedByUser.getUsername());
-        System.out.println("Server ID: " + serverId);
 
-        // must check if the invited user exists/
+        boolean hasInvitePermission = checkInvitePermissions(invitedByUser, server);
+        System.out.println("Has invite permission: " + hasInvitePermission);
+        if (!hasInvitePermission) {
+            response.put("message", "You do not have permission to invite users to this server.");
+            return response;
+        }
+        if (!User.isValidUser(invitedByUser, invitedByToken)) {
+            response.put("message", "Invalid token for user.");
+            return response;
+        }
 
-        if (makesuretocheckpermissions && invitedByUser != null && invitedUser != null) {
+        if (hasInvitePermission && invitedByUser != null && invitedUser != null) {
             try (Connection conn = DatabaseConnection.getConnection();
                     PreparedStatement stmt = conn.prepareStatement(
                             "INSERT INTO server_invites (server_id, invited_user_id, invited_by_user_id) VALUES (?,?, ?)")) {
