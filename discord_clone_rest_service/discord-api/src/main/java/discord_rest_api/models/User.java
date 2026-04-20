@@ -78,7 +78,12 @@ public class User implements Serializable {
     public byte[] getPasswordBytes() {
         return passwordBytes;
     }
+
     public void setPasswordBytes(byte[] passwordBytes) {
         this.passwordBytes = passwordBytes;
+    }
+    
+    public static boolean isValidUser (User user, String token) {
+        return user != null && user.getToken() != null && token != null && user.getToken().equals(token);
     }
 }
