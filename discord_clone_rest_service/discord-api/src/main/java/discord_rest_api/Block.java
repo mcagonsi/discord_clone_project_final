@@ -18,8 +18,7 @@ import jakarta.ws.rs.Produces;
 @Path("block")
 public class Block {
 
-    /*TODO: Copied from friends, maybe move from both classes into 
-            its (util?) own to reduce code duplication*/
+    //TODO: Copied from friends, maybe move from both classes into its (util?) own to reduce code duplication
     private User getUserIdFromUserUID(String user_uid) {
         try (
             Connection conn = DatabaseConnection.getConnection();
@@ -97,7 +96,6 @@ public class Block {
         return user;
     }
 
-    //TODO: test this to ensure it works
     @POST
     @Path("list")
     @Produces("application/json")
@@ -132,7 +130,6 @@ public class Block {
         return response;
     }
 
-    //TODO: test this to ensure it works
     @POST
     @Path("user")
     @Produces("application/json")
