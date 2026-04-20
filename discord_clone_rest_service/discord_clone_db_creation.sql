@@ -119,8 +119,6 @@ INSERT INTO permissions (name) VALUES
 ('INVITE_USER'),
 ('KICK_USER'),
 ('CREATE_CHANNEL'),
--- ('READ_CHANNEL'),
--- ('WRITE_CHANNEL'),
 ('MANAGE_ROLES');
 
 CREATE TABLE role_permissions (
