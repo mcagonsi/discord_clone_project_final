@@ -17,6 +17,15 @@ CREATE TABLE users (
 INSERT INTO users (user_uid, display_name, username, email, password, token, status, created_at) 
 VALUES ('admin-c9693', 'Juggernaut Team', 'admin', 'Juggernaut.dev@cna.nl.ca', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', '9f548315d0d986b1da4eb63679cbe2379adb5fa3d5a3174ecc0c73ffeaaee6c7', 'offline', NOW());
 
+-- Insert 3 random test users
+INSERT INTO users (user_uid, display_name, username, email, password, status, created_at) 
+VALUES 
+('user-a1b2c', 'John Developer', 'johndeveloper', 'john@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW()),
+('user-d3e4f', 'Sarah Engineer', 'sarahengineer', 'sarah@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW()),
+('user-g5h6i', 'Mike Designer', 'mikedesigner', 'mike@example.com', '$2a$12$2hTMlZOov7ZSmcwHq89FSeCc0HFgy3fBKr13ppZ.s/1rygQ7SG1ce', 'offline', NOW());
+
+
+
 CREATE TABLE friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -29,6 +38,19 @@ CREATE TABLE friends (
 
     UNIQUE (user_id, friend_user_id)
 );
+
+-- Insert friend requests: Admin sends 3 requests
+-- Admin (id=1) to John (id=2) - ACCEPTED
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 2, TRUE, NOW());
+
+-- Admin (id=1) to Sarah (id=3) - ACCEPTED
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 3, TRUE, NOW());
+
+-- Admin (id=1) to Mike (id=4) - PENDING (not accepted)
+INSERT INTO friends (user_id, friend_user_id, accepted, created_at)
+VALUES (1, 4, FALSE, NOW());
 
 CREATE TABLE blocked_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +69,7 @@ CREATE TABLE servers (
     owner_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    type ENUM('private', 'public') NOT NULL,
+    isPublic TINYINT NOT NULL DEFAULT 1,
     invite_code VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -97,8 +119,6 @@ INSERT INTO permissions (name) VALUES
 ('INVITE_USER'),
 ('KICK_USER'),
 ('CREATE_CHANNEL'),
-('READ_CHANNEL'),
-('WRITE_CHANNEL'),
 ('MANAGE_ROLES');
 
 CREATE TABLE role_permissions (
@@ -171,18 +191,22 @@ CREATE TABLE server_invites (
     FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE,
     FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE CASCADE
+    ,
+    UNIQUE (server_id, invited_user_id, invited_by_user_id)
 );
 
 CREATE TABLE direct_chats (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_a_id INT NOT NULL,
-    user_b_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    user_a_id INT AS (LEAST(sender_id, receiver_id)) STORED,
+    user_b_id INT AS (GREATEST(sender_id, receiver_id)) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_a_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_b_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
 
-    UNIQUE (user_a_id, user_b_id)
+    UNIQUE KEY uniq_direct_pair (user_a_id, user_b_id)
 );
 
 CREATE TABLE direct_chat_messages (
@@ -215,10 +239,14 @@ FOR EACH ROW
 BEGIN
     DECLARE v_channel_id INT;
     DECLARE v_role_id INT;
+    DECLARE v_server_member_id INT;
     
     -- Insert owner into server_members
     INSERT INTO server_members (server_id, user_id)
     VALUES (NEW.id, NEW.owner_id);
+
+    -- capture the server_member id for assigning roles
+    SET v_server_member_id = LAST_INSERT_ID();
     
     -- Create "general" channel
     INSERT INTO channels (server_id, name, created_by)
@@ -235,6 +263,32 @@ BEGIN
     -- Add "everyone" role permissions to "general" channel
     INSERT INTO channel_role_permissions (channel_id, role_id, can_read, can_write)
     VALUES (v_channel_id, v_role_id, TRUE, TRUE);
+
+    -- Assign the "everyone" role to the owner (the owner was inserted earlier into server_members)
+    -- Use INSERT IGNORE to avoid duplicate-key errors in case of unexpected duplicates
+    INSERT IGNORE INTO server_member_roles (server_member_id, role_id)
+    VALUES (v_server_member_id, v_role_id);
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- Trigger to automatically assign the "everyone" role to any newly added server member
+CREATE TRIGGER assign_everyone_role_after_member_insert AFTER INSERT ON server_members
+FOR EACH ROW
+BEGIN
+    DECLARE v_everyone_role_id INT;
+    -- Try to find the "everyone" role for the server
+    SELECT id INTO v_everyone_role_id FROM roles WHERE server_id = NEW.server_id AND name = 'everyone' LIMIT 1;
+
+    -- Only assign the role if it already exists. Do NOT create a role here —
+    -- create_default_server_setup is responsible for creating the "everyone" role when a server is created.
+    IF v_everyone_role_id IS NOT NULL THEN
+        -- Assign the everyone role to the newly created server_member. Use INSERT IGNORE to avoid duplicate-key errors.
+        INSERT IGNORE INTO server_member_roles (server_member_id, role_id) VALUES (NEW.id, v_everyone_role_id);
+    END IF;
 END //
 
 DELIMITER ;

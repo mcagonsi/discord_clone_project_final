@@ -2,24 +2,25 @@ package discord_rest_api.models;
 
 import java.io.Serializable;
 
-public class Permission implements Serializable {
-    
+public class MsgAttachment implements Serializable {
+
     private int id;
-    private  String name;
+    private String path;
 
     public int getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getPath() {
+        return path;
     }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
 }
