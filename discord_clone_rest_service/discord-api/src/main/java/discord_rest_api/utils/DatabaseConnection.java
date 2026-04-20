@@ -1,9 +1,11 @@
 package discord_rest_api.utils;
 
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.naming.Context;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DatabaseConnection {
     public static Connection getConnection(){
@@ -11,7 +13,7 @@ public class DatabaseConnection {
             Context ctx = new InitialContext();
             DataSource ds = (DataSource)ctx.lookup("java:/comp/env/jdbc/DiscordClone");
             return ds.getConnection();
-        } catch (Exception e) {
+        } catch (NamingException | SQLException e) {
             throw new RuntimeException("Failed to get database connection", e);
         }
         
