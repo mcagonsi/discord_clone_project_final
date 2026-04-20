@@ -14,6 +14,7 @@ import discord_rest_api.models.Permission;
 import discord_rest_api.models.Role;
 import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
+import discord_rest_api.utils.ConstantVariables;
 import discord_rest_api.utils.DatabaseConnection;
 import discord_rest_api.utils.InviteCodeGenerator;
 import discord_rest_api.utils.PermissionConst;
@@ -24,6 +25,7 @@ public class ServerResource implements Serializable {
 
     private User getUserFromUid(String user_uid) {
         // Logic to retrieve the User object based on the provided user_uid
+        // figure out how we can abstract this to one central source or method
         // This could involve querying the database or an in-memory data structure
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn
@@ -35,24 +37,24 @@ public class ServerResource implements Serializable {
                     user.setId(rs.getInt("id"));
                     user.setToken(rs.getString("token"));
                     user.setUsername(rs.getString("username"));
-                    // Set other user properties as needed
+                    
                     return user;
                 } else {
                     // Handle case where user is not found
                     return null;
                 }
             }
-            // Query the database to find the user by user_uid
-            // If found, return the User object
+            
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle exceptions appropriately
+         
         }
-        return null; // Placeholder return statement
+        return null; 
     }
 
     private User getUserByUsername(String username) {
         // Logic to retrieve the User object based on the provided username
+        // figure out how we can abstract this to one central source or method
         // This could involve querying the database or an in-memory data structure
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(
@@ -66,15 +68,15 @@ public class ServerResource implements Serializable {
                     // Set other user properties as needed
                     return user;
                 } else {
-                    // Handle case where user is not found
+                   
                     return null;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle exceptions appropriately
+            
         }
-        return null; // Placeholder return statement
+        return null; 
     }
 
     private Server getServerById(int serverId) {
@@ -120,7 +122,8 @@ public class ServerResource implements Serializable {
                 msgStmt.setInt(1, conversation_id);
                 msgStmt.setInt(2, sender.getId());
                 msgStmt.setString(3, "Server Invite. Server Name: " + server.getName()
-                        + ", Invite Code: " + server.getInviteCode());
+                        + ", Invite Code: " + server.getInviteCode() + ", Link: " + ConstantVariables.DOMAIN_URL + "/"
+                        + server.getId() + "/" + server.getInviteCode());
                 int msgRowsAffected = msgStmt.executeUpdate();
                 if (msgRowsAffected > 0) {
                     System.out.println("Direct chat message sent successfully!");
@@ -208,12 +211,12 @@ public class ServerResource implements Serializable {
     @POST
     @Path("/create")
     @Consumes("application/json")
-    public void createServer(HashMap<String, Object> JSON) {
+    public void createServer(HashMap<String, Object> request) {
         /// Expecting user_uid, token, name, description, is_public(boolean) in the JSON
         /// payload
         // Logic to create a new server using the provided data
-        String user_uid = (String) JSON.get("user_uid");
-        String token = (String) JSON.get("token");
+        String user_uid = (String) request.get("user_uid");
+        String token = (String) request.get("token");
         User owner = getUserFromUid(user_uid);
         if (owner == null) {
             System.out.println("User not found for user_uid: " + user_uid);
@@ -223,7 +226,7 @@ public class ServerResource implements Serializable {
             System.out.println("Invalid token for user_uid: " + user_uid);
             return;
         }
-        if (!JSON.containsKey("name") || !JSON.containsKey("description") || !JSON.containsKey("is_public")) {
+        if (!request.containsKey("name") || !request.containsKey("description") || !request.containsKey("is_public")) {
             System.out.println("Missing required fields for server creation");
             return;
         }
@@ -234,13 +237,13 @@ public class ServerResource implements Serializable {
             String inviteCode = InviteCodeGenerator.generateCode(8);
 
             System.out.println(
-                    "Creating server with name: " + JSON.get("name") + ", description: " + JSON.get("description")
-                            + ", owner_id: " + owner.getId() + ", is_public: " + (Boolean) JSON.get("is_public")
+                    "Creating server with name: " + request.get("name") + ", description: " + request.get("description")
+                            + ", owner_id: " + owner.getId() + ", is_public: " + (Boolean) request.get("is_public")
                             + ", invite_code: " + inviteCode);
-            stmt.setString(1, (String) JSON.get("name"));
-            stmt.setString(2, (String) JSON.get("description"));
+            stmt.setString(1, (String) request.get("name"));
+            stmt.setString(2, (String) request.get("description"));
             stmt.setInt(3, owner.getId());
-            stmt.setBoolean(4, (Boolean) JSON.get("is_public")); // Store as private if is_public is false
+            stmt.setBoolean(4, (Boolean) request.get("is_public")); // Store as private if is_public is false
             stmt.setString(5, inviteCode);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -256,10 +259,10 @@ public class ServerResource implements Serializable {
     @POST
     @Path("/search")
     @Consumes("application/json")
-    public void searchPublicServers(HashMap<String, Object> JSON) {
+    public void searchPublicServers(HashMap<String, Object> request) {
 
         // Expecting "search" field in the JSON payload containing the search query
-        String query = (String) JSON.get("search");
+        String query = (String) request.get("search");
 
         if (query == null || query.trim().isEmpty()) {
             System.out.println("Search query cannot be null or empty");
@@ -282,6 +285,7 @@ public class ServerResource implements Serializable {
                     server.setCreatedAt(rs.getTimestamp("created_at").toString());
                     server.setOwnerId(rs.getInt("owner_id"));
                     server.setPublic(rs.getBoolean("isPublic"));
+                    server.setInviteCode(rs.getString("invite_code"));
                     foundServers.add(server);
                     System.out.println("Found public server - ID: " + server.getId() + ", Name: " + server.getName()
                             + ", Description: " + server.getDescription());
@@ -297,13 +301,12 @@ public class ServerResource implements Serializable {
     @Path("/invite")
     @Consumes("application/json")
     @Produces("application/json")
-    public HashMap<String, Object> sendServerInvite(HashMap<String, Object> JSON) {
+    public HashMap<String, Object> sendServerInvite(HashMap<String, Object> request) {
         // payload comes with serverid, invitedUser, and invitedBy, the invitedBy comes
         // with uid and token
-        String serverId = (String) JSON.get("serverId");
-        String invitedUsername = (String) JSON.get("invitedUser");
-
-        HashMap<String, Object> invitedBy = (HashMap<String, Object>) JSON.get("invitedBy");
+        String serverId = (String) request.get("serverId");
+        String invitedUsername = (String) request.get("invitedUser");
+        HashMap<String, Object> invitedBy = (HashMap<String, Object>) request.get("invitedBy");
         String invitedByUid = (String) invitedBy.get("uid");
         String invitedByToken = (String) invitedBy.get("token"); // use this to validate user
 
@@ -313,15 +316,29 @@ public class ServerResource implements Serializable {
         Server server = getServerById(Integer.parseInt(serverId));
 
         HashMap<String, Object> response = new HashMap<>();
+        if (invitedByUser == null) {
+            response.put("message", "Invalid user credentials.");
+            return response;
+        }
+        if (!User.isValidUser(invitedByUser, invitedByToken)) {
+            response.put("message", "Invalid token for user.");
+            return response;
+        }
+
+        if (invitedUser == null) {
+            response.put("message", "Invited user not found.");
+            return response;
+        }
+
+        if (invitedUser.getUsername().equals(invitedByUser.getUsername())) {
+            response.put("message", "You cannot invite yourself to a server.");
+            return response;
+        }
 
         boolean hasInvitePermission = checkInvitePermissions(invitedByUser, server);
         System.out.println("Has invite permission: " + hasInvitePermission);
         if (!hasInvitePermission) {
             response.put("message", "You do not have permission to invite users to this server.");
-            return response;
-        }
-        if (!User.isValidUser(invitedByUser, invitedByToken)) {
-            response.put("message", "Invalid token for user.");
             return response;
         }
 
@@ -346,31 +363,106 @@ public class ServerResource implements Serializable {
         return response;
     }
 
-    // for joining a private server with id we need to make sure they have been
-    // invited already
-    // need to do a trigger that if someone joins a server, it automatically assigns
-    // a role (everyone) and addes them to the general channel
-    // the everyone role should automatically have read permissions for the general
-    // channel and write permissions for the general channel
-    // we need to figure out how to make the invite code system work especially for
-    // joining private servers. should it be unique
-    // we could for the invite link sent join the invitecode + serverid as one then
-    // it becomes a path param the link can be like
-    // domain.com/join/{invitecode}/{serverid}
-    // that we can slice first 8 characters for the invite code and the rest for the
-    // server id. then we can check if the invite code is valid for that server and
-    // if so, add the user to the server and assign them the everyone role
-    // the link will take someone to a page that shows the server name, description,
-    // and an accept invite button. if they click the accept invite button, it will
-    // trigger the join server endpoint with the invite code and server id as path
-    // params. then we can check if the invite code is valid for that server and if
-    // so, add the user to the server and assign them the everyone role
-    // also making sure the user is signed in and has a valid token before allowing
-    // them to join the server. if they are not signed in, we can redirect them to
-    // the login page and after they log in, we can redirect them back to the server
-    // invite page where they can click the accept invite button to join the server.
-    // this way we can ensure that only authenticated users can join servers and we
-    // can also track which user joined which server for future features like
-    // showing a list of servers a user is a member of on their profile page.
+    @PUT
+    @Path("/join/")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public HashMap<String, Object> joinServer(HashMap<String, Object> request) {
+        HashMap<String, Object> response = new HashMap<>();
+        int serverId = Integer.parseInt((String) request.get("serverId"));
+        String inviteCode = (String) request.get("inviteCode");
+        HashMap<String, Object> user = (HashMap<String, Object>) request.get("user");
+
+        Server server = getServerById(serverId);
+        User userObj = getUserFromUid((String) user.get("uid"));
+
+        boolean userIsvalid = User.isValidUser(userObj, (String) user.get("token"));
+        boolean isServerPublic = server.isPublic();
+        boolean userIsOnServer = false;
+        boolean userHasInvite = false;
+
+        if (userObj == null || !userIsvalid) {
+            System.out.println("Invalid user or token for user.");
+            response.put("message", "Invalid user or token.");
+
+        }
+        if (inviteCode == null || inviteCode.trim().isEmpty() || serverId == 0) {
+            System.out.println("Invalid server credentials.");
+            response.put("message", "Invalid server credentials.");
+
+        }
+        if (inviteCode != null && !server.getInviteCode().equals(inviteCode)) {
+            System.out.println("Invalid invite code.");
+            response.put("message", "Invalid invite code.");
+
+        }
+        // check if he exists on server
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            try (PreparedStatement stmt = conn
+                    .prepareStatement("SELECT * FROM server_members WHERE server_id = ? AND user_id = ?")) {
+                stmt.setInt(1, serverId);
+                stmt.setInt(2, userObj.getId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    userIsOnServer = rs.next();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error occurred while checking if user is on the server.");
+            response.put("message", "Error occurred while checking server membership.");
+
+        }
+        if (userIsOnServer) {
+            System.out.println("User is already a member of the server.");
+            response.put("message", "You are already a member of the server.");
+
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // checking if user has an invite
+            boolean hasAcceptedInvite = false;
+            int inviteServerid = -1;
+            if (!isServerPublic) {
+                try (PreparedStatement stmt = conn
+                        .prepareStatement("SELECT * FROM server_invites WHERE server_id = ? AND invited_user_id = ?")) {
+                    stmt.setInt(1, serverId);
+                    stmt.setInt(2, userObj.getId());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        userHasInvite = rs.next();
+                        if (userHasInvite) {
+                            inviteServerid = rs.getInt("id");
+                        }
+                    }
+                }
+                if (inviteServerid != -1) {
+                    try (PreparedStatement stmt = conn
+                            .prepareStatement("UPDATE server_invites SET accepted = true WHERE id = ?")) {
+                        stmt.setInt(1, inviteServerid);
+                        int result = stmt.executeUpdate();
+                        if (result > 0) {
+                            hasAcceptedInvite = true;
+                        }
+                    }
+                }
+            }
+
+            if (isServerPublic || !isServerPublic && userHasInvite && hasAcceptedInvite) {
+                // Proceed to join the server
+                try (PreparedStatement stmt = conn
+                        .prepareStatement("INSERT INTO server_members (server_id, user_id) VALUES (?, ?)")) {
+                    stmt.setInt(1, server.getId());
+                    stmt.setInt(2, userObj.getId());
+                    int result = stmt.executeUpdate();
+                    if (result > 0) {
+                        System.out.println("User successfully added to the server.");
+                        response.put("message", "You have successfully joined the server.");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error occurred while joining the server.");
+            response.put("message", "Error occurred while joining the server.");
+        }
+        return response;
+    }
 
 }
