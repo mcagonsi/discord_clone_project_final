@@ -2,6 +2,8 @@ package discord_rest_api.models;
 
 import java.io.Serializable;
 
+import discord_rest_api.utils.ConstantVariables;
+
 public class Server implements Serializable {
     private int id;
     private String name;
@@ -69,7 +71,7 @@ public class Server implements Serializable {
     }
 
     public String getInviteCodeSlug() {
-        return invite_code != null ? this.invite_code.toString() : null;
+        return invite_code != null ? ConstantVariables.DOMAIN_URL + "/" + this.id + "/" + this.invite_code.toString() : null;
     }
 
 }
