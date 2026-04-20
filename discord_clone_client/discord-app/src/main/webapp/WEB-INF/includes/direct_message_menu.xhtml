@@ -9,12 +9,13 @@
 
 
         <h:panelGroup id="directMessages" layout="block" class="pl-3">
-
-            <h1>Direct Messaging:</h1>
-
-            <h:inputText id="UIDInput" value="Enter UID to message" class="rounded-md "/>
-            
-            <h:commandButton value="Load Messages" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
+          <h:form>
+              <h1>Direct Messaging</h1>
+              <h:outputLabel for="UIDInput" class="pr-1">
+                <h:outputText value="Enter User ID: " />
+              </h:outputLabel>
+              <h:inputText value="" class="rounded-md mr-2" />
+              <h:commandButton value="Load Messages" class="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-1 inline-flex items-center justify-center max-w-[150px] pl-1"/>
+          </h:form>
         </h:panelGroup>
-
 </ui:composition>
