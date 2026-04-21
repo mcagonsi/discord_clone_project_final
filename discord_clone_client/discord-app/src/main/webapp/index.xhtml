@@ -28,11 +28,11 @@
 
   
     <h:panelGroup rendered="#{authBean.authType == 'login'}">
-      <ui:include src="templates/components/login.xhtml" />
+      <ui:include src="/templates/components/login.xhtml" />
     </h:panelGroup>
 
     <h:panelGroup rendered="#{authBean.authType == 'signup'}">
-      <ui:include src="templates/components/signup.xhtml" />
+      <ui:include src="/templates/components/signup.xhtml" />
     </h:panelGroup>
   </ui:define>
 </ui:composition>
