@@ -1,0 +1,20 @@
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+        <title>Basic Server Creation Menu</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+
+        <h:panelGroup id="createServer" layout="block">
+          <h:form>
+              <h1 class="text-white">Create Servers</h1>
+          </h:form>
+          <h:form>
+            <h:commandButton value="Create Public Server" styleClass="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]" />
+            <h:commandButton value="Create Private Server" styleClass="ml-3 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]"/>
+          </h:form>
+        </h:panelGroup>
+</ui:composition>
