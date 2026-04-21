@@ -113,9 +113,8 @@ public class ServerResource implements Serializable {
     private boolean sendInviteDirectMessage(User sender, User receiver, String serverId) {
         // robust serverId parse
         Server server = getServerById(Integer.parseInt(serverId));
-        int conversation_id = DirectChat.getConversationId(sender, receiver);
-
-        // send message if we have a conversation id
+        int conversation_id = DirectChat.checkOrCreateConversationIdForUsers(sender, receiver);
+         // send message if we have a conversation id
         if (conversation_id != -1) {
             try (Connection conn = DatabaseConnection.getConnection();
                     PreparedStatement msgStmt = conn.prepareStatement(
