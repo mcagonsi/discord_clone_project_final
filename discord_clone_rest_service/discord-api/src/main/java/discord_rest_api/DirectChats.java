@@ -43,7 +43,6 @@ public class DirectChats {
         return null;
     }
 
-    //TODO: Complete this
     @POST
     @Path("list")
     @Produces("application/json")
@@ -54,12 +53,16 @@ public class DirectChats {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                "SELECT id FROM direct_chats WHERE " // TODO: finish this statement
+                "SELECT id FROM direct_chats WHERE sender_id=? OR reciever_id=?;"
             );
         ) {
-            
-        } catch (Exception e) {
-            // TODO: handle exception
+            stmt.setInt(1, user.getId());
+            stmt.setInt(2, user.getId());
+
+            //TODO: Finish this
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return response;
     }
 }
