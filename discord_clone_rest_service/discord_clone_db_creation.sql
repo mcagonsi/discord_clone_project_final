@@ -195,18 +195,32 @@ CREATE TABLE server_invites (
     UNIQUE (server_id, invited_user_id, invited_by_user_id)
 );
 
+
+-- better for scaling
+-- CREATE TABLE direct_chats (
+--     id INT AUTO_INCREMENT PRIMARY KEY,
+--     sender_id INT NOT NULL,
+--     receiver_id INT NOT NULL,
+--     user_a_id INT AS (LEAST(sender_id, receiver_id)) STORED,
+--     user_b_id INT AS (GREATEST(sender_id, receiver_id)) STORED,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+--     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+--     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+
+--     UNIQUE KEY uniq_direct_pair (sender_id, user_b_id)
+-- );
+
 CREATE TABLE direct_chats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
-    user_a_id INT AS (LEAST(sender_id, receiver_id)) STORED,
-    user_b_id INT AS (GREATEST(sender_id, receiver_id)) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
 
-    UNIQUE KEY uniq_direct_pair (user_a_id, user_b_id)
+    UNIQUE KEY uniq_direct_pair (sender_id, receiver_id)
 );
 
 CREATE TABLE direct_chat_messages (
