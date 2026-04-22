@@ -1,6 +1,6 @@
 <!-- index.xhtml -->
 <ui:composition
-  template="templates/layout.xhtml"
+  template="templates/RootLayout.xhtml"
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:f="jakarta.faces.core"
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
@@ -28,11 +28,11 @@
 
   
     <h:panelGroup rendered="#{authBean.authType == 'login'}">
-      <ui:include src="/templates/components/login.xhtml" />
+      <ui:include src="/components/loginCard.xhtml" />
     </h:panelGroup>
 
     <h:panelGroup rendered="#{authBean.authType == 'signup'}">
-      <ui:include src="/templates/components/signup.xhtml" />
+      <ui:include src="/components/signupCard.xhtml" />
     </h:panelGroup>
   </ui:define>
 </ui:composition>

@@ -12,7 +12,12 @@ public class User implements Serializable {
     private String status;
     private String created_at;
 
-    public String getser_uid() {
+
+    public String getUserUid() {
+        return user_uid;
+    }
+
+    public String getUser_uid() {
         return user_uid;
     }
 

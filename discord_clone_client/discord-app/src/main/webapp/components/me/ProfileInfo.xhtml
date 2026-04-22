@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <div class="max-w-xl w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6">
+        
+        <div class="flex items-start justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-5">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Profile</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Account information for @#{sessionedUser.username}
+                </p>
+            </div>
+
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                #{sessionedUser.status eq 'online' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 
+                  (sessionedUser.status eq 'idle' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 
+                  'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300')}">
+                #{sessionedUser.status}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            
+            <div class="space-y-1">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    Display Name
+                </p>
+                <p class="text-base font-semibold text-gray-900 dark:text-gray-100">
+                    #{sessionedUser.display_name}
+                </p>
+            </div>
+
+            <div class="space-y-1">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    Username
+                </p>
+                <p class="text-base text-gray-800 dark:text-gray-200">
+                    @#{sessionedUser.username}
+                </p>
+            </div>
+
+            <div class="space-y-1 sm:col-span-2">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    Email
+                </p>
+                <p class="text-base text-gray-800 dark:text-gray-200 break-all">
+                    #{sessionedUser.email}
+                </p>
+            </div>
+
+            <div class="space-y-1">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    Joined
+                </p>
+                <p class="text-base text-gray-800 dark:text-gray-200">
+                    #{sessionedUser.created_at}
+                </p>
+            </div>
+
+            <div class="space-y-1">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    UID
+                </p>
+                <p class="text-base text-gray-800 dark:text-gray-200 break-all">
+                    #{sessionedUser.user_uid}
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</ui:composition>

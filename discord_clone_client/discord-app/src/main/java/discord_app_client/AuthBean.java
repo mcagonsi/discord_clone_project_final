@@ -57,7 +57,7 @@ public class AuthBean implements Serializable {
     public String checkLoginStatus() {
         if (isLoggedIn()) {
             System.out.println("User is logged in: " + loggedUser.getUsername());
-            return "/user/index.xhtml?faces-redirect=true";
+            return "/me/index.xhtml?faces-redirect=true";
         }
         return null;
     }
@@ -105,7 +105,7 @@ public class AuthBean implements Serializable {
                         "Login successful! User: " + loggedUser.getUsername() + ", Token: " + loggedUser.getToken());
                 System.out.println(response.get("message").toString());
                 message = null; // Clear any previous messages on successful login
-                redirect = "/user/index.xhtml?faces-redirect=true";
+                redirect = "/me/index.xhtml?faces-redirect=true";
 
             } else {
                 message = response.get("message").toString();

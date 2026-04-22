@@ -1,0 +1,83 @@
+:root {
+    /* Logo-inspired palette (muted for a more professional look) */
+    --accent: #a83a33;        /* slightly desaturated red */
+    --accent-dark: #7f2a25;   /* darker red for hover */
+    --metal: #9ea3a8;         /* subtle metallic gray */
+    --bg-1: #050406;          /* deep charcoal */
+    --bg-2: #0b0c0e;          /* slightly lighter charcoal */
+    --card-bg: #0f1113;       /* solid card surface */
+    --card-border: rgba(255,255,255,0.03);
+  
+}
+
+/* App background: understated, professional */
+.app-bg {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    color-scheme: dark;
+}
+
+/* Card surface: solid, not transparent, with subtle elevation */
+.card-surface {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    overflow: hidden;
+    /* padding left to consumers to avoid forcing spacing, but add if desired:
+       padding: 16px;
+    */
+}
+
+/* Use-card-surface utility mirrors .card-surface */
+.use-card-surface {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px var(--card-shadow);
+}
+
+/* Accent button helpers (keep !important for compatibility with Tailwind overrides) */
+.btn-accent,
+.bg-indigo-600 {
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+}
+.btn-accent:hover,
+.bg-indigo-700 {
+    background-color: var(--accent-dark) !important;
+    color: #ffffff !important;
+}
+
+/* Map other utility classes to the same accent */
+.bg-purple-600 {
+    background-color: var(--accent) !important;
+}
+.bg-purple-700 {
+    background-color: var(--accent-dark) !important;
+}
+
+/* Accent text */
+.text-accent {
+    color: var(--accent) !important;
+}
+
+/* Muted / metallic text */
+.text-metal {
+    color: var(--metal) !important;
+}
+
+/* Subtle focus ring using the accent color */
+.focus-ring-accent:focus {
+    box-shadow: 0 0 0 4px rgba(168,58,51,0.08);
+    outline: none;
+}
+
+/* Make link accents understated */
+a.accent-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+a.accent-link:hover {
+    color: var(--accent-dark);
+    text-decoration: underline;
+}
