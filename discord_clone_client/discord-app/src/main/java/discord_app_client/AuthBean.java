@@ -162,7 +162,15 @@ public class AuthBean implements Serializable {
     }
     
     public String logOut() {
-        loggedUser = new SessionedUser();
+        loggedUser.setCreated_at(null);
+        loggedUser.setDisplay_name(null);
+        loggedUser.setEmail(null);
+        loggedUser.setUsername(null);
+        loggedUser.setToken(null);
+        loggedUser.setStatus(null);
+        loggedUser.setUserUid(null);
+        loggedUser.setPassword(null);
+        
         return "/index.xhtml?faces-redirect=true";
     }
 
