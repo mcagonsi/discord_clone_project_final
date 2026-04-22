@@ -11,27 +11,27 @@
 
     </h:head>
     <h:body styleClass="min-h-screen bg-gradient-to-br from-[#5b209a] to-[#000000]">
+        <div class="flex items-center justify-center">
+            <h1 class="text-white">Welcome to Team Juggernaut's Discord Clone Project. This is the main page.</h1>
+        </div>
         <div class="relative min-h-screen">
-            <div class="fixed top-4 left-4 z-20">
+            <h:panelGroup styleClass="fixed top-4 left-4 z-20">
                 <ui:include src="/WEB-INF/includes/main_user_menu.xhtml" />
-            </div>
-            <h:panelGroup styleClass="pt-20 flex items-center justify-center">
+            </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'create' ? 'block flex items-center justify-center' : 'hidden'}">
                 <ui:include src="/WEB-INF/includes/create_server.xhtml" />
             </h:panelGroup>
-            <!--Gonna need to make the toggle function to check which button is active to properly test the menu buttons-->
             <div class="min-h-[40vh] flex items-center justify-center py-8">
-                <div class="w-full max-w-3xl mx-auto px-4">
+                <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block max-w-3xl mx-auto px-4' : 'hidden'}">
                     <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
-                    <div class="border border-gray-200 shadow-sm rounded-lg p-6 text-white">
-                        <ui:include src="/WEB-INF/includes/server_list.xhtml" />
-                        <h:outputText value="Welcome to the Groups and Friends page!" styleClass="text-2xl text-white font-semibold block" />
-                        <h:outputText value="Manage your groups, friends, and permissions from here." styleClass="mt-2 text-sm text-white block" />
-                    </div>
-                </div>
+                </h:panelGroup>
             </div>
-        <h:form>
-            <h:commandButton styleClass="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" value="Fetch Permissions" action="#{permissionBean.getPermissions}" />
-        </h:form>
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
+                <ui:include src="/WEB-INF/includes/base_server_ui.xhtml" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
+                <ui:include src="/WEB-INF/includes/server_list.xhtml" />
+            </h:panelGroup>
        </div>
     </h:body>
 </html>

@@ -10,9 +10,11 @@
 
         <h:panelGroup id="createServer" layout="block">
           <h:form>
-              <h1 class="text-white">Create Servers</h1>
+            <div class="mr-10">
+                <h1 class="text-white flex justify-center">Create Servers</h1>
+            </div>
           </h:form>
-          <h:form>
+          <h:form styleClass="flex items-center justify-center pr-10">
             <h:commandButton value="Create Public Server" styleClass="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]" />
             <h:commandButton value="Create Private Server" styleClass="ml-3 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]"/>
           </h:form>
