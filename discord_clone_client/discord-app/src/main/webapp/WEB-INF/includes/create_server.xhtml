@@ -12,11 +12,12 @@
           <h:form>
             <div class="mr-10">
                 <h1 class="text-white flex justify-center">Create Servers</h1>
+                <p class="text-white">Actually this could probably be a single form with the option to make it public or private instead of 2 forms</p>
             </div>
           </h:form>
-          <h:form styleClass="flex items-center justify-center pr-10">
-            <h:commandButton value="Create Public Server" styleClass="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]" />
-            <h:commandButton value="Create Private Server" styleClass="ml-3 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md px-2 py-1 inline-flex items-center justify-center max-w-[200px]"/>
+          <h:form styleClass="flex items-center justify-center pr-10 gap-3">
+            <h:commandButton value="Create Public Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white px-2 py-1 inline-flex items-center justify-center hover:cursor-pointer whitespace-nowrap" />
+            <h:commandButton value="Create Private Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white px-2 py-1 inline-flex items-center justify-center hover:cursor-pointer whitespace-nowrap"/>
           </h:form>
         </h:panelGroup>
 </ui:composition>

@@ -10,7 +10,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
 
     </h:head>
-    <h:body styleClass="min-h-screen bg-gradient-to-br from-[#5b209a] to-[#000000]">
+    <h:body styleClass="min-h-screen bg-gradient-to-br from-[#000000] to-[#E02600]">
         <div class="flex items-center justify-center">
             <h1 class="text-white">Welcome to Team Juggernaut's Discord Clone Project. This is the main page.</h1>
         </div>
@@ -26,11 +26,14 @@
                     <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
                 </h:panelGroup>
             </div>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
                 <ui:include src="/WEB-INF/includes/base_server_ui.xhtml" />
             </h:panelGroup>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
                 <ui:include src="/WEB-INF/includes/server_list.xhtml" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="text-white text-shadow-md text-shadow-black">
+                <ui:include src="/WEB-INF/includes/user_profile.xhtml" />
             </h:panelGroup>
        </div>
     </h:body>
