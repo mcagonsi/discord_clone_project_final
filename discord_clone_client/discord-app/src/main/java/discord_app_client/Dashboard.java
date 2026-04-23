@@ -16,10 +16,16 @@ public class Dashboard implements Serializable {
     private String MenuSubOption;
     private String serverRailOption = "DMs";
     private boolean showProfile = false;
+    private boolean showNotifications = false;
 
     public void toggleShowProfile() {
         this.showProfile = !this.showProfile;
         System.out.println("Show Profile: " + this.showProfile);
+    }
+
+    public void toggleShowNotifications() {
+        this.showNotifications = !this.showNotifications;
+        System.out.println("Show Notifications: " + this.showNotifications);
     }
 
     public void toggleServerRailOption(String option) {
@@ -67,6 +73,14 @@ public class Dashboard implements Serializable {
 
     public void setShowProfile(boolean showProfile) {
         this.showProfile = showProfile;
+    }
+
+    public boolean isShowNotifications() {
+        return showNotifications;
+    }
+
+    public void setShowNotifications(boolean showNotifications) {
+        this.showNotifications = showNotifications;
     }
 
     public void setServerRailOption(String serverRailOption) {
