@@ -9,14 +9,12 @@
   <div class="flex flex-row h-full w-full min-h-0 overflow-hidden">
     <!-- Server Rail -->
     <div class="w-16 bg-gray-900 flex flex-col h-full min-h-0">
-      <ui:insert name="serverRail" />
-      sidebar for icons
+      <ui:include src="/components/ui/serverRail.xhtml" />
     </div>
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-gray-800 flex flex-col h-full min-h-0">
-      <ui:insert name="sideNav" />
-      side navigation
+    <aside  class="w-64 bg-gray-800 flex flex-col h-full min-h-0">
+      <ui:include src="/components/ui/sideNavigation/index.xhtml" />
     </aside>
 
     <!-- Main -->
