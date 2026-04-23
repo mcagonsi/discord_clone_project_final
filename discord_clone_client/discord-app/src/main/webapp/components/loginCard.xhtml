@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
   lang="en"
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:h="jakarta.faces.html"
@@ -37,7 +37,7 @@
         </label>
         <h:inputSecret
           id="password"
-          value="#{authBean.password}"
+          value="#{authBean.user.password}"
           placeholder="Enter your password"
           redisplay="false"
           styleClass="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
@@ -61,4 +61,4 @@
 
     </h:form>
   </div>
-</html>
+</ui:composition>
