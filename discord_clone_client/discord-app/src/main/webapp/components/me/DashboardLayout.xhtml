@@ -1,51 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?><ui:composition
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
   lang="en"
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:h="http://xmlns.jcp.org/jsf/html"
   xmlns:f="http://xmlns.jcp.org/jsf/core"
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
-  <h:head>
-    <title>Juggernaut App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </h:head>
-
-  <h:body class="bg-gray-950 text-white min-h-screen">
-    <div class="flex h-screen">
-      <!-- Server Rail -->
-      <div class="w-20 bg-gray-900 flex flex-col">
-        <ui:insert name="serverRail" />
-        sidebar for icons
-      </div>
-
-      <!-- Sidebar -->
-      <aside class="w-64 bg-gray-800 flex flex-col">
-        <ui:insert name="sideNav" />
-        side navigation
-      </aside>
-
-      <!-- Main -->
-      <main class="flex-1 flex flex-col">
-        <!-- Top Bar -->
-        <header class="h-14 border-b border-gray-700 flex items-center px-4">
-          <ui:insert name="titleBar" />
-          Title bar shows who you chat with or what channel you're in
-        </header>
-
-        <!-- this section covers the chat and showing members info or receiver info -->
-        <section class="flex-1 flex overflow-hidden">
-          <!-- Main Content -->
-          <div class="flex-1 p-4 overflow-y-auto">
-            <ui:insert name="content" />
-            direct chat and server channel chat content
-          </div>
-
-          <!-- Members -->
-          <aside class="w-64 bg-gray-900 p-4">
-            <ui:insert name="membersPanel" />
-          </aside>
-        </section>
-      </main>
+  <div class="flex flex-row h-full w-full min-h-0 overflow-hidden">
+    <!-- Server Rail -->
+    <div class="w-16 bg-gray-900 flex flex-col h-full min-h-0">
+      <ui:insert name="serverRail" />
+      sidebar for icons
     </div>
-  </h:body>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 flex flex-col h-full min-h-0">
+      <ui:insert name="sideNav" />
+      side navigation
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col h-full min-h-0">
+      <!-- Top Bar -->
+      <header class="h-10 border-b border-gray-700 flex items-center px-4">
+        <ui:insert name="titleBar" />
+        Title bar shows who you chat with or what cshannel you're in
+      </header>
+
+      <!-- this section covers the chat and showing members info or receiver info -->
+      <section class="flex-1 flex overflow-hidden min-h-0">
+        <!-- Main Content -->
+        <div class="flex-1 p-4 overflow-y-auto min-h-0">
+          <ui:insert name="content" />
+          direct chat and server channel chat content
+        </div>
+
+        <!-- Members -->
+        <aside class="w-64 bg-gray-900 p-4 overflow-auto min-h-0">
+          <ui:insert name="membersPanel" />
+        </aside>
+      </section>
+    </main>
+  </div>
 </ui:composition>

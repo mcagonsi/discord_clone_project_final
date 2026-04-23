@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html
   lang="en"
+  class="h-full"
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:h="http://xmlns.jcp.org/jsf/html"
   xmlns:f="http://xmlns.jcp.org/jsf/core"
@@ -12,17 +13,13 @@
     <h:outputStylesheet library="css" name="theme.css" />
   </h:head>
 
-  <h:body>
-    <div class="app-bg min-h-screen text-white">
-      <header class="w-full border-b border-gray-800">
-        <ui:include src="../components/me/titleBar.xhtml" />
-      </header>
+  <h:body class="h-full flex flex-col bg-black m-0">
+    <header class="w-full h-12 border-b border-gray-800 bg-transparent z-20 shrink-0">
+      <ui:include src="../components/me/titleBar.xhtml" />
+    </header>
 
-      <div class="grid grid-cols-12 gap-6">
-        <main class="col-span-12 md:col-span-9 lg:col-span-10">
-          <ui:include src="../components/me/DashboardLayout.xhtml" />
-        </main>
-      </div>
-    </div>
+    <main class="bg-green-500 flex-1 min-h-0 overflow-hidden flex">
+      <ui:include src="../components/me/DashboardLayout.xhtml" />
+    </main>
   </h:body>
 </html>
