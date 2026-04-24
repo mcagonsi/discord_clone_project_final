@@ -98,12 +98,12 @@ public class DirectChats {
                         directChats.add(directChat);
                     }
                 }
-                // Add response
+                response.put("directChatList", directChats);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            // Add response
+            response.put("message", "Failed to retrieve direct chats");
         }
         return response;
     }
