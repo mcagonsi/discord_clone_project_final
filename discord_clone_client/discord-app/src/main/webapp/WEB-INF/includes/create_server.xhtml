@@ -9,15 +9,17 @@
 
 
         <h:panelGroup id="createServer" layout="block">
-          <h:form>
             <div class="mr-10">
-                <h1 class="text-white flex justify-center">Create Servers</h1>
-                <p class="text-white">Actually this could probably be a single form with the option to make it public or private instead of 2 forms</p>
+                <h1 class="text-white flex justify-center">Create a Server</h1>
             </div>
-          </h:form>
-          <h:form styleClass="flex items-center justify-center pr-10 gap-3">
-            <h:commandButton value="Create Public Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white px-2 py-1 inline-flex items-center justify-center hover:cursor-pointer whitespace-nowrap" />
-            <h:commandButton value="Create Private Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white px-2 py-1 inline-flex items-center justify-center hover:cursor-pointer whitespace-nowrap"/>
+          <h:form styleClass="flex items-center justify-center pr-5 gap-3 mt-10">
+            <h:outputLabel for="serverName" styleClass="pr-1 text-white whitespace-nowrap text-lg">
+                <h:outputText styleClass="text-white" id="serverName" value="Enter your server's name: " />
+            </h:outputLabel>
+            <h:inputText value="" styleClass="mr-2 text-black" />
+            <h:commandButton value="Create Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
+            <h:outputLabel for="privateServer" value="Make this server private?" styleClass="text-white whitespace-nowrap"/>
+            <h:selectBooleanCheckbox id="privateServer" />
           </h:form>
         </h:panelGroup>
 </ui:composition>

@@ -1,0 +1,20 @@
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+        <title>Basic Server Creation Menu</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+
+        <h:panelGroup id="joinServer" layout="block">
+          <h:form styleClass="flex items-center justify-center pr-5 gap-3 mt-10">
+            <h:outputLabel for="serverName" styleClass="pr-1 text-white whitespace-nowrap text-lg">
+                <h:outputText styleClass="text-white" id="serverName" value="Enter server's name: " />
+            </h:outputLabel>
+            <h:inputText value="" styleClass="mr-2 text-black" />
+            <h:commandButton value="Join Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
+          </h:form>
+        </h:panelGroup>
+</ui:composition>

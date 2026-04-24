@@ -1,9 +1,10 @@
 package discord_app_client;
 
 
-import jakarta.inject.Named;
-import jakarta.enterprise.context.SessionScoped;
 import java.io.Serializable;
+
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
 
 @Named("checkButtonToggleBean")
 @SessionScoped
@@ -29,5 +30,9 @@ public class checkButtonToggleBean implements Serializable {
 
     public void showServers() {
         activePanel = "servers";
+    }
+
+    public void joinServer() {
+        activePanel = "joinThisServer";
     }
 }
