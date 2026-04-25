@@ -10,6 +10,7 @@ import java.util.List;
 
 import discord_rest_api.models.DirectChat;
 import discord_rest_api.models.Message;
+import discord_rest_api.models.DirectMsgAttachment;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Produces;
@@ -72,6 +73,32 @@ public class DirectChats {
         return null;
     }
 
+    private DirectMsgAttachment getAttachmentFromMessageId(int id) {
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM direct_chat_msg_attachment WHERE direct_chat_msg_id=?;"
+            )
+        ) {
+            stmt.setInt(1, id);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                if (rs.next()) {
+                    DirectMsgAttachment attachment = new DirectMsgAttachment();
+                    attachment.setId(rs.getInt("id"));
+                    attachment.setDirectChatMessageId(id);
+                    attachment.setFilename(rs.getString("file_name"));
+                    attachment.setPath(rs.getString("file_path"));
+                    return attachment;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @POST
     @Path("list")
     @Produces("application/json")
@@ -120,7 +147,6 @@ public class DirectChats {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                // I assume conversation_id is the id for the direct chat
                 "SELECT * FROM direct_chat_messages WHERE conversation_id=?;"
             );
         ) {
@@ -131,19 +157,25 @@ public class DirectChats {
                 while(rs.next()) {
                     Message message = new Message();
                     message.setAuthorId(rs.getInt("conversation_id"));
-                    message.setCreatedAt(rs.getString("created_at")); // Not sure if this converts on its own
+                    message.setCreatedAt(rs.getString("created_at"));
                     message.setContent(rs.getString("content"));
-                    // TODO: figure out how to handle attachments
+
+                    DirectMsgAttachment attachment = getAttachmentFromMessageId(rs.getInt("id"));
+                    if (attachment == null) {
+                        message.setAttachment(attachment);
+                    }
+
                     messages.add(message);
                 }
-                // Should this just return the list or append it to a chat/directchat class object?
                 response.put("chatlog", messages);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             response.put("message", "Failed to retrieve chatlog");
         }
-
         return response;
+        /*
+            TODO: may need to either make changes to the message class or make new DirectMessage class
+        */
     }
 }
