@@ -49,6 +49,14 @@
                 'hidden'}">
                 <ui:include src="/WEB-INF/includes/join_server.xhtml" />
             </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'fixed top-12 right-4' : 
+                'hidden'}">
+                <ui:include src="WEB-INF/includes/server_members_list.xhtml" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'block fixed inset-4 flex items-center justify-center' : 
+                'hidden'}">
+                <ui:include src="WEB-INF/includes/server_chat.xhtml" />
+            </h:panelGroup>
        </div>
     </h:body>
 </html>

@@ -10,10 +10,16 @@
 
         <h:panelGroup id="joinServer" layout="block">
           <h:form styleClass="flex items-center justify-center pr-5 gap-3 mt-10">
+
+            <!-- Label -->
             <h:outputLabel for="serverName" styleClass="pr-1 text-white whitespace-nowrap text-lg">
                 <h:outputText styleClass="text-white" id="serverName" value="Enter server's name: " />
             </h:outputLabel>
+            
+            <!-- Input field -->
             <h:inputText value="" styleClass="mr-2 text-black" />
+
+            <!-- Button that will join a server in respect to the server name -->
             <h:commandButton value="Join Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
           </h:form>
         </h:panelGroup>

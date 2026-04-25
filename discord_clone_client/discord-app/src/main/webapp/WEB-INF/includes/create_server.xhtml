@@ -9,16 +9,27 @@
 
 
         <h:panelGroup id="createServer" layout="block">
+          <!-- Just the header -->
             <div class="mr-10">
                 <h1 class="text-white flex justify-center">Create a Server</h1>
             </div>
+
+            <!-- Actually interactive section -->
           <h:form styleClass="flex items-center justify-center pr-5 gap-3 mt-10">
+
+          <!-- Just the label for the input field -->
             <h:outputLabel for="serverName" styleClass="pr-1 text-white whitespace-nowrap text-lg">
                 <h:outputText styleClass="text-white" id="serverName" value="Enter your server's name: " />
             </h:outputLabel>
+
+            <!-- The actual input field -->
             <h:inputText value="" styleClass="mr-2 text-black" />
+
+            <!-- Button that will create the server with the name from the input field -->
             <h:commandButton value="Create Server" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
             <h:outputLabel for="privateServer" value="Make this server private?" styleClass="text-white whitespace-nowrap"/>
+
+            <!-- This checkbox will determine if the server is created as a private server or not -->
             <h:selectBooleanCheckbox id="privateServer" />
           </h:form>
         </h:panelGroup>

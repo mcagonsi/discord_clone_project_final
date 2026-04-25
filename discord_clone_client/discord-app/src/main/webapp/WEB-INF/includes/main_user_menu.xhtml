@@ -10,25 +10,31 @@
 
         <h:panelGroup id="menu" layout="block" styleClass="pl-3">
             <h:form>
+                <!-- Main page button, doesn't actually link to anything yet -->
                 <h:commandButton value="Main Page" styleClass="bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/10 text-white 
                 my-2 px-4 py-2 inline-flex items-center justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
 
+                <!-- Friends List -->
                 <h:commandButton value="View Friends List" action="#{checkButtonToggleBean.showDMs}" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center 
                 grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
 
+                <!-- View Servers -->
                 <h:commandButton value="View Server List" action="#{checkButtonToggleBean.showServers}" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center justify-center 
                 grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer"/>
 
+                <!-- Join a Server -->
                 <h:commandButton value="Join Server" action="#{checkButtonToggleBean.joinServer}" styleClass="bg-white/20 backdrop-blur-md border 
                 border-white/30 hover:bg-white/10 text-white my-2 px-4 py-2 inline-flex items-center justify-center 
                 grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer" />
 
+                <!-- Create a Server -->
                 <h:commandButton value="Create Server" action="#{checkButtonToggleBean.showCreate}" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center 
                 justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer" />
 
+                <!-- View your current server. This one might get cut though. Not sure we really need a "current server" button -->
                 <h:commandButton value="Current Server" action="#{checkButtonToggleBean.showServer}" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white  my-2 px-4 py-2 inline-flex items-center 
                 justify-center grid grid-cols-1 max-w-[150px] w-full hover:cursor-pointer" />

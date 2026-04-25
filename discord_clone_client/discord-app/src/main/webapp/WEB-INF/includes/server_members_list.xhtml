@@ -1,0 +1,20 @@
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+        <title>Basic Direct Message Menu</title>
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+
+        <h:panelGroup id="serverMembers" layout="block">
+          <h:form>
+              <h:panelGroup layout="block" styleClass="text-white bg-white/20 backdrop-blur-md border border-white/30 
+              text-white my-2 px-4 py-1 inline-flex w-[350px] h-[700px] flex flex-col">
+                  <h1 class="text-white border border-white/30 text-white my-2 px-4 py-1 inline-flex items-center 
+                  justify-center max-w-[400px]">*List of server members*</h1>
+              </h:panelGroup>
+          </h:form>
+        </h:panelGroup>
+</ui:composition>
