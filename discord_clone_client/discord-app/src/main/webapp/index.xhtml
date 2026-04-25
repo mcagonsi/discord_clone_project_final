@@ -18,24 +18,35 @@
             <h:panelGroup styleClass="fixed top-4 left-4 z-20">
                 <ui:include src="/WEB-INF/includes/main_user_menu.xhtml" />
             </h:panelGroup>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'create' ? 'block flex items-center justify-center mt-40' : 'hidden'}">
+            <h:panelGroup layout="block"
+                styleClass="#{checkButtonToggleBean.activePanel eq 'create' ? 
+                'block flex items-center justify-center mt-40' : 
+                'hidden'}">
                 <ui:include src="/WEB-INF/includes/create_server.xhtml" />
             </h:panelGroup>
             <div class="min-h-[40vh] flex items-center justify-center py-8">
-                <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block max-w-3xl mx-auto px-4' : 'hidden'}">
+                <h:panelGroup layout="block"
+                    styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block max-w-3xl mx-auto px-4' : 'hidden'}">
                     <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
                 </h:panelGroup>
             </div>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 'block fixed top-8 left-[12rem] text-white bg-white/20 backdrop-blur-md border border-white/30 text-white my-2 px-4 py-1 inline-flex items-center justify-center max-w-[400px]' : 'hidden'}">
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 
+            'block fixed top-8 left-[12rem] text-white bg-white/20 backdrop-blur-md border border-white/30 
+            text-white my-2 px-4 py-1 inline-flex items-center justify-center max-w-[400px]' : 'hidden'}">
                 <ui:include src="/WEB-INF/includes/base_server_ui.xhtml" />
             </h:panelGroup>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 'block fixed top-8 left-[12rem]' : 'hidden'}">
+            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 
+            'block fixed top-8 left-[12rem]' : 
+            'hidden'}">
                 <ui:include src="/WEB-INF/includes/server_list.xhtml" />
             </h:panelGroup>
             <h:panelGroup layout="block" styleClass="text-white text-shadow-md text-shadow-black">
                 <ui:include src="/WEB-INF/includes/user_profile.xhtml" />
             </h:panelGroup>
-            <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'joinThisServer' ? 'block flex items-center justify-center' : 'hidden'}">
+            <h:panelGroup layout="block"
+                styleClass="#{checkButtonToggleBean.activePanel eq 'joinThisServer' ? 
+                'block flex items-center justify-center' : 
+                'hidden'}">
                 <ui:include src="/WEB-INF/includes/join_server.xhtml" />
             </h:panelGroup>
        </div>

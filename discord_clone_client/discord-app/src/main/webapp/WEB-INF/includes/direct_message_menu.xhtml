@@ -15,7 +15,20 @@
                 <h:outputText styleClass="text-white" id="UIDInput" value="Enter User ID: " />
               </h:outputLabel>
               <h:inputText value="" styleClass="rounded-md mr-2 text-black" />
-              <h:commandButton value="Load Messages" styleClass="bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-md my-2 px-2 py-1 inline-flex items-center justify-center max-w-[150px] pl-1"/>
+              <h:commandButton value="Load Messages" styleClass="bg-white/20 backdrop-blur-md 
+                border border-white/30 hover:bg-white/10 text-white my-2 
+                px-2 py-1 items-center justify-center max-w-[150px] pl-1" />
+              <h:panelGroup layout="block" styleClass="flex-1 overflow-y-auto">
+                <!-- Messages will appear in this area -->
+              </h:panelGroup>
+              <h:panelGroup layout="block" styleClass="text-white bg-white/20 backdrop-blur-md border border-white/30 text-white my-2 px-4 
+                            py-1 inline-flex w-[500px] h-[700px] flex flex-col justify-end">
+              <h:inputFile id="attachFile" styleClass="hidden"/>
+              <h:outputLabel for="attachFile" value="+" styleClass="bg-white/20 backdrop-blur-md 
+                border border-white/30 hover:bg-white/10 text-white inline-flex items-center 
+                justify-center hover:cursor-pointer max-w-[80px] ml-4" />
+              <h:inputText value="" styleClass="text-black px-2 py-1 w-[350px] ml-[8rem] min-h-4 flex flex-col" />
+              </h:panelGroup>
           </h:form>
         </h:panelGroup>
 </ui:composition>
