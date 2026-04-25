@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import discord_rest_api.models.DirectChat;
+import discord_rest_api.models.Message;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Produces;
@@ -105,6 +106,44 @@ public class DirectChats {
             e.printStackTrace();
             response.put("message", "Failed to retrieve direct chats");
         }
+        return response;
+    }
+
+    @POST
+    @Path("chatlog")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        int directChatId = Integer.parseInt(JSON.get("directChatId"));
+        List<Message> messages = new ArrayList<Message>();
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                // I assume conversation_id is the id for the direct chat
+                "SELECT * FROM direct_chat_messages WHERE conversation_id=?;"
+            );
+        ) {
+            stmt.setInt(1, directChatId);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                while(rs.next()) {
+                    Message message = new Message();
+                    message.setAuthorId(rs.getInt("conversation_id"));
+                    message.setCreatedAt(rs.getString("created_at")); // Not sure if this converts on its own
+                    message.setContent(rs.getString("content"));
+                    // TODO: figure out how to handle attachments
+                    messages.add(message);
+                }
+                // Should this just return the list or append it to a chat/directchat class object?
+                response.put("chatlog", messages);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Failed to retrieve chatlog");
+        }
+
         return response;
     }
 }
