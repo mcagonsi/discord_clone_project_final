@@ -136,6 +136,12 @@ public class DirectChats {
         return response;
     }
 
+    /*
+        TODO: Attachments need to be tested, not sure how I would do such
+
+        Additionally, may need to either make changes to the message class or make new DirectMessage class
+        so that the messages don't have the currently unneeded id and channelid
+    */
     @POST
     @Path("chatlog")
     @Produces("application/json")
@@ -174,8 +180,5 @@ public class DirectChats {
             response.put("message", "Failed to retrieve chatlog");
         }
         return response;
-        /*
-            TODO: may need to either make changes to the message class or make new DirectMessage class
-        */
     }
 }

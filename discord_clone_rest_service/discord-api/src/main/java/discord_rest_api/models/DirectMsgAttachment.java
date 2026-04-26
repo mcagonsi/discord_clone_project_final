@@ -1,7 +1,5 @@
 package discord_rest_api.models;
 
-import java.io.Serializable;
-
 public class DirectMsgAttachment extends MsgAttachment {
 
     private int directChatMessageId;
