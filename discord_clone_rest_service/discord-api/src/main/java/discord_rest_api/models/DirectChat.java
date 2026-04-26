@@ -8,6 +8,10 @@ import discord_rest_api.utils.DatabaseConnection;
 
 public class DirectChat extends Chat {
 
+    private int id;
+    private int senderId;
+    private int receiverId;
+
     public static int checkOrCreateConversationIdForUsers(User user1, User user2) {
         int conversation_id = -1;
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -64,4 +68,29 @@ public class DirectChat extends Chat {
         }
         return conversation_id;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(int senderId) {
+        this.senderId = senderId;
+    }
+
+    public int getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(int receiverId) {
+        this.receiverId = receiverId;
+    }
+    
 }
