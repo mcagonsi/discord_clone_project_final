@@ -179,4 +179,64 @@ public class DirectChats {
         }
         return response;
     }
+
+    // TODO: add attachments
+    @POST
+    @Path("send")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> sendDirectMessage(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        User user = getUserFromUserUID(JSON.get("user_uid"));
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "INSERT INTO direct_chat_messages (conversation_id, sender_user_id, content) VALUES (?, ?, ?);"
+            );
+        ) {
+            stmt.setInt(1, Integer.parseInt(JSON.get("conversationId")));
+            stmt.setInt(2, user.getId());
+            stmt.setString(3, JSON.get("content"));
+
+            int result = stmt.executeUpdate();
+            if (result == 1) {
+                response.put("message", "Message sent successfully");
+            } else {
+                response.put("message", "Could not send message");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Could not send message");
+        }
+        return response;
+    }
+
+    @POST
+    @Path("delete")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> deleteDirectMessage(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE direct_chat_messages SET is_deleted=1 WHERE conversation_id=?;"
+            );
+        ) {
+            stmt.setInt(1, Integer.parseInt(JSON.get("direct_chat_id")));
+            
+            int result = stmt.executeUpdate();
+            if (result == 1) {
+                response.put("message", "Message deleted successfully");
+            } else {
+                response.put("message", "Could not delete message");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Could not delete message");
+        }
+        return response;
+    }
+
 }
