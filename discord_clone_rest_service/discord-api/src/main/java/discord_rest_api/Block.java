@@ -19,7 +19,7 @@ import jakarta.ws.rs.Produces;
 public class Block {
 
     //TODO: Copied from friends, maybe move from both classes into its (util?) own to reduce code duplication
-    private User getUserIdFromUserUID(String user_uid) {
+    private User getUserFromUserUID(String user_uid) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -103,7 +103,7 @@ public class Block {
     public HashMap<String, Object> getBlockList(HashMap<String, String> JSON) {
         List<User> blocks = new ArrayList<User>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -136,7 +136,7 @@ public class Block {
     @Consumes("application/json")
     public HashMap<String, Object> blockUser(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         User userToBlock = getUserbyUsername(JSON.get("user_to_block"));
 
         if (user == null) {

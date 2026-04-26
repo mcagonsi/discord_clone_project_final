@@ -16,7 +16,7 @@ import jakarta.ws.rs.Produces;
 @Path("directmessage")
 public class DirectMessages {
 
-    private User getUserIdFromUserUID(String user_uid) {
+    private User getUserFromUserUID(String user_uid) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -42,7 +42,6 @@ public class DirectMessages {
         return null;
     }
 
-    // TODO: this currently requires the id for the direct chat, might need to be changed at some point
     // TODO: add attachments
     @POST
     @Path("send")
@@ -50,7 +49,7 @@ public class DirectMessages {
     @Consumes("application/json")
     public HashMap<String, Object> sendDirectMessage(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -84,10 +83,10 @@ public class DirectMessages {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE direct_chat_messages SET is_deleted=1 WHERE ;" //TODO: finish this
+                "UPDATE direct_chat_messages SET is_deleted=1 WHERE conversation_id=?;"
             );
         ) {
-            //TODO: finish this
+            stmt.setInt(1, Integer.parseInt(JSON.get("direct_chat_id")));
             
             int result = stmt.executeUpdate();
             if (result == 1) {

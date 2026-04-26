@@ -20,7 +20,7 @@ import jakarta.ws.rs.Path;
 @Path("directchats")
 public class DirectChats {
 
-    private User getUserIdFromUserUID(String user_uid) {
+    private User getUserFromUserUID(String user_uid) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -78,7 +78,7 @@ public class DirectChats {
     public HashMap<String, Object> getDirectChats(HashMap<String, String> JSON) {
         List<DirectChat> directChats = new ArrayList<DirectChat>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
