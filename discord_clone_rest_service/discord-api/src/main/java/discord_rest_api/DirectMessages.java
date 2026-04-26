@@ -43,6 +43,7 @@ public class DirectMessages {
     }
 
     // TODO: this currently requires the id for the direct chat, might need to be changed at some point
+    // TODO: add attachments
     @POST
     @Path("send")
     @Produces("application/json")
@@ -87,10 +88,19 @@ public class DirectMessages {
             );
         ) {
             //TODO: finish this
+            
+            int result = stmt.executeUpdate();
+            if (result == 1) {
+                response.put("message", "Message deleted successfully");
+            } else {
+                response.put("message", "Could not delete message");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             response.put("message", "Could not delete message");
         }
         return response;
     }
+
+    /* TODO: possibly add method to get all messages - with deleted items content replaced with notice of deletion */
 }
