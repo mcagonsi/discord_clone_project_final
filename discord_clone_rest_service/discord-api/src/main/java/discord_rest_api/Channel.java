@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-
-import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Consumes;
@@ -16,21 +14,6 @@ import jakarta.ws.rs.Produces;
 
 @Path("channel")
 public class Channel {
-
-    // private Server getServerFromName(String name) {
-    //     Server server = null;
-    //     try (
-    //         Connection conn = DatabaseConnection.getConnection();
-    //         PreparedStatement stmt = conn.prepareStatement(
-    //             "SELECT * FROM servers WHERE name"
-    //         );
-    //     ) {
-            
-    //     } catch (SQLException e) {
-    //          e.printStackTrace();
-    //     }
-    //     return server;
-    // }
 
     private User getUserFromUserUID(String user_uid) {
         try (
@@ -58,16 +41,16 @@ public class Channel {
         return null;
     }
 
-    //TODO: should it also check if creator has permissions?
-    //TODO: should it get server from id or another value (like name)?
     @POST
     @Path("create")
     @Produces("application/json")
     @Consumes("application/json")
     public HashMap<String, Object> createChannel(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        //Server server = getServerFromName(JSON.get("server_name")); //Unused as server name is not unique
         User user = getUserFromUserUID(JSON.get("user_uid"));
+
+        //TODO: Check to make sure user has channel creation permissions
+
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
