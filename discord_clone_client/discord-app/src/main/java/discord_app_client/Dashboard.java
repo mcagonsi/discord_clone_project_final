@@ -1,6 +1,8 @@
 package discord_app_client;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.SessionScoped;
@@ -12,12 +14,34 @@ public class Dashboard implements Serializable {
     private String title;
     private String MainMenuOption;
     private String MenuSubOption;
+    private String serverRailOption = "DMs";
     private boolean showProfile = false;
+    private boolean showNotifications = false;
 
     public void toggleShowProfile() {
         this.showProfile = !this.showProfile;
         System.out.println("Show Profile: " + this.showProfile);
     }
+
+    public void toggleShowNotifications() {
+        this.showNotifications = !this.showNotifications;
+        System.out.println("Show Notifications: " + this.showNotifications);
+    }
+
+    public void toggleServerRailOption(String option) {
+        this.serverRailOption = option;
+        System.out.println("Server Rail Option: " + this.serverRailOption);
+    }
+
+    //just for testing
+    public List<String> getServers() {
+        return Arrays.asList("Server 1", "Server 2", "Server 3");
+    }
+  
+    public List<String> getDirectMessages() {
+        return Arrays.asList("DM 1", "DM 2", "DM 3");
+    }
+  
 
     public void setTitle(String title) {
         this.title = title;
@@ -49,6 +73,23 @@ public class Dashboard implements Serializable {
 
     public void setShowProfile(boolean showProfile) {
         this.showProfile = showProfile;
+    }
+
+    public boolean isShowNotifications() {
+        return showNotifications;
+    }
+
+    public void setShowNotifications(boolean showNotifications) {
+        this.showNotifications = showNotifications;
+    }
+
+    public void setServerRailOption(String serverRailOption) {
+        this.serverRailOption = serverRailOption;
+        
+    }
+
+    public String getServerRailOption() {
+        return serverRailOption;
     }
 
 }
