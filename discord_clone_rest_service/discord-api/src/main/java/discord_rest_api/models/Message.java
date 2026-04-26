@@ -2,7 +2,6 @@ package discord_rest_api.models;
 
 public class Message {
     private int id;
-    private int channelId;
     private int authorId;
     private String content;
     private String createdAt;
@@ -15,14 +14,6 @@ public class Message {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(int channelId) {
-        this.channelId = channelId;
     }
 
     public int getAuthorId() {

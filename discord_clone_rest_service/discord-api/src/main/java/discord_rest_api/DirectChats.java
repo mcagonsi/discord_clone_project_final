@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import discord_rest_api.models.DirectChat;
-import discord_rest_api.models.Message;
+import discord_rest_api.models.DirectMessage;
 import discord_rest_api.models.DirectMsgAttachment;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
@@ -138,9 +138,6 @@ public class DirectChats {
 
     /*
         TODO: Attachments need to be tested, not sure how I would do such
-
-        Additionally, may need to either make changes to the message class or make new DirectMessage class
-        so that the messages don't have the currently unneeded id and channelid
     */
     @POST
     @Path("chatlog")
@@ -149,11 +146,11 @@ public class DirectChats {
     public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
         int directChatId = Integer.parseInt(JSON.get("directChatId"));
-        List<Message> messages = new ArrayList<Message>();
+        List<DirectMessage> messages = new ArrayList<DirectMessage>();
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM direct_chat_messages WHERE conversation_id=?;"
+                "SELECT * FROM direct_chat_messages WHERE conversation_id=? AND is_deleted=0;"
             );
         ) {
             stmt.setInt(1, directChatId);
@@ -161,10 +158,11 @@ public class DirectChats {
                 ResultSet rs = stmt.executeQuery();
             ) {
                 while(rs.next()) {
-                    Message message = new Message();
+                    DirectMessage message = new DirectMessage();
                     message.setAuthorId(rs.getInt("conversation_id"));
                     message.setCreatedAt(rs.getString("created_at"));
                     message.setContent(rs.getString("content"));
+                    message.setDirectChatId(directChatId);
 
                     DirectMsgAttachment attachment = getAttachmentFromMessageId(rs.getInt("id"));
                     if (attachment == null) {
