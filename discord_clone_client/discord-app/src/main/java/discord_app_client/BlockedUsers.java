@@ -8,6 +8,7 @@ import discord_app_client.models.User;
 import discord_app_client.utils.Variables;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -18,7 +19,7 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 
 @Named("blockedUsers")
-@SessionScoped
+@RequestScoped
 public class BlockedUsers implements Serializable {
 
     @Inject

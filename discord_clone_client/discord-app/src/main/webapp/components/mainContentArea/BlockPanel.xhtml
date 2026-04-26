@@ -9,7 +9,7 @@
     id="blockListPanel"
     layout="block"
     styleClass="h-full min-h-0 flex flex-col bg-gray-950 text-gray-100">
-
+    <f:event type="preRenderComponent" listener="#{blockedUsers.loadBlockedUsers}" />
     <!-- Header -->
     <div class="shrink-0 border-b border-gray-800 px-5 py-4">
       <h2 class="text-lg font-semibold">Blocked Users</h2>
@@ -28,7 +28,7 @@
           value="Block"
           action="#{blockedUsers.blockThisUser}"
           styleClass="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
-          <f:ajax execute="@form" render="blockedList messagePanel" />
+          <f:ajax execute="@form" render="blockListPanel" />
         </h:commandButton>
       </h:form>
     </div>
