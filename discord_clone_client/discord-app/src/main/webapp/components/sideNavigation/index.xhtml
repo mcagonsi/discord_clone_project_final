@@ -5,11 +5,11 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
   <h:panelGroup id="sideNav" layout="block">
-    <h:panelGroup id="userNav" rendered="#{dashboard.serverRailOption == 'DMs'}">
+    <h:panelGroup id="userNav" rendered="#{dashboardNavigation.sideBarPanel == 'DMs'}">
       <ui:include src="userNav.xhtml" />
     </h:panelGroup>
 
-    <h:panelGroup id="serverNav" rendered="#{dashboard.serverRailOption == 'server'}">
+    <h:panelGroup id="serverNav" rendered="#{dashboardNavigation.sideBarPanel == 'server'}">
       <ui:include src="serverNav.xhtml" />
     </h:panelGroup>
   </h:panelGroup>

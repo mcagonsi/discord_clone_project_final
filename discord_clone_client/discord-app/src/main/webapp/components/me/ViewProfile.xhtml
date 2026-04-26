@@ -11,13 +11,13 @@
             <h:commandButton
                 id="profileToggleBtn"
                 value="#{sessionedUser.display_name}"
-                action="#{dashboard.toggleShowProfile}"
+                action="#{dashboardNavigation.toggleShowProfile}"
                 styleClass="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 transition">
                 <f:ajax execute="@this" render="profilePanel" />
             </h:commandButton>
 
             <h:panelGroup id="profilePanel" layout="block" styleClass="absolute right-0 mt-2 w-80 z-50">
-                <ui:fragment rendered="#{dashboard.showProfile}">
+                <ui:fragment rendered="#{dashboardNavigation.showProfile}">
                     <div class="rounded-xl border border-gray-700 bg-gray-900 shadow-lg p-4 space-y-4">
                         <ui:include src="ProfileInfo.xhtml" />
 
