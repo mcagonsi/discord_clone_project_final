@@ -8,33 +8,43 @@
         <script src="https://cdn.tailwindcss.com"></script>
 
 
-        <h:panelGroup id="directMessages" layout="block" styleClass="fixed top-5 left-15">
+        <h:panelGroup id="directMessages" layout="block" styleClass="top-5">
           <h:form>
               <h1 class="text-white">Direct Messaging</h1>
+
               <!-- Putting a label next to the input field -->
               <h:outputLabel for="UIDInput" styleClass="pr-1 text-white">
                 <h:outputText styleClass="text-white" id="UIDInput" value="Enter User ID: " />
               </h:outputLabel>
+
               <!-- Input field for the User ID the user will search for -->
               <h:inputText value="" styleClass="rounded-md mr-2 text-black" />
+
               <!-- Button to load messages from database -->
               <h:commandButton value="Load Messages" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white my-2 
                 px-2 py-1 items-center justify-center max-w-[150px] pl-1" />
               <h:panelGroup layout="block" styleClass="flex-1 overflow-y-auto">
+
                 <!-- Messages will appear in this area -->
               </h:panelGroup>
+
               <!-- Section that displays the messages -->
               <h:panelGroup layout="block" styleClass="text-white bg-white/20 backdrop-blur-md border border-white/30 text-white my-2 px-4 
-                            py-1 inline-flex w-[500px] h-[700px] flex flex-col justify-end">
+                            py-1 inline-flex w-[550px] h-[700px] flex flex-col justify-end">
+
               <!-- Button to open file selection for attachments -->
               <h:inputFile id="attachFile" styleClass="hidden"/>
+
               <!-- Styling for the attachment button so it matches the rest of the UI -->
               <h:outputLabel for="attachFile" value="+" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white inline-flex items-center 
-                justify-center hover:cursor-pointer max-w-[80px] ml-4" />
+                justify-center hover:cursor-pointer max-w-[80px] absolute bottom-3 left-5 h-8 w-14" />
+
                 <!-- Input field for sending messages in DMs -->
-              <h:inputText value="" styleClass="text-black px-2 py-1 w-[350px] ml-[8rem] min-h-4 flex flex-col" />
+              <h:inputText value="" styleClass="text-black px-2 py-1 w-[350px] ml-[5rem] min-h-4 flex flex-col absolute bottom-3" />
+              <h:commandButton value="Send" styleClass="absolute bottom-3 right-5 bg-white/20 backdrop-blur-md 
+                border border-white/30 hover:bg-white/10 h-8 w-14" />
               </h:panelGroup>
           </h:form>
         </h:panelGroup>

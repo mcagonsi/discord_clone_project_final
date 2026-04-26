@@ -26,7 +26,7 @@
             </h:panelGroup>
             <div class="min-h-[40vh] flex items-center justify-center py-8">
                 <h:panelGroup layout="block"
-                    styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block max-w-3xl mx-auto px-4' : 'hidden'}">
+                    styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block px-4' : 'hidden'}">
                     <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
                 </h:panelGroup>
             </div>
@@ -36,8 +36,8 @@
                 <ui:include src="/WEB-INF/includes/base_server_ui.xhtml" />
             </h:panelGroup>
             <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'servers' ? 
-            'block fixed top-8 left-[12rem]' : 
-            'hidden'}">
+            'block fixed top-8 ml-[38rem] mt-6' : 
+                'hidden'}">
                 <ui:include src="/WEB-INF/includes/server_list.xhtml" />
             </h:panelGroup>
             <h:panelGroup layout="block" styleClass="text-white text-shadow-md text-shadow-black">

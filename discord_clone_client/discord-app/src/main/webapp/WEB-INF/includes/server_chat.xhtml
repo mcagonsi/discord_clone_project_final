@@ -3,7 +3,7 @@
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:ui="jakarta.faces.facelets">
-        <title>Basic Direct Message Menu</title>
+        <title>Basic Server Chat</title>
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
 
@@ -12,17 +12,17 @@
           <h:form>
               <h:panelGroup layout="block" styleClass="text-white bg-white/20 backdrop-blur-md border border-white/30 
               text-white ml-6 px-4 py-1 inline-flex w-[620px] h-[700px] flex flex-col">
-                  <h1 class="text-white border border-white/30 text-white my-2 px-4 py-1 inline-flex items-center 
+                  <h1 class="text-white border border-white/30 text-white ml-[6rem] mt-[1rem] px-4 py-1 inline-flex items-center 
                   justify-center max-w-[400px]">*Text channel name here*</h1>
               <!-- Button to open file selection for attachments -->
               <h:inputFile id="attachFile" styleClass="flex hidden" />
               <!-- Styling for the attachment button so it matches the rest of the UI -->
               <h:outputLabel for="attachFile" value="+" styleClass="bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 text-white inline-flex items-center 
-                justify-center hover:cursor-pointer max-w-[80px] absolute bottom-3 left-3 h-8 w-14" />
+                justify-center hover:cursor-pointer max-w-[80px] absolute bottom-3 left-5 h-8 w-14" />
                 <!-- Input field for sending messages in DMs -->
               <h:inputText value="" styleClass="text-black px-2 h-8 w-[425px] absolute bottom-3 ml-[5rem]" />
-              <h:commandButton value="Send" styleClass="absolute bottom-3 right-3 bg-white/20 backdrop-blur-md 
+              <h:commandButton value="Send" styleClass="absolute bottom-3 right-5 bg-white/20 backdrop-blur-md 
                 border border-white/30 hover:bg-white/10 h-8 w-14" />
               </h:panelGroup>
           </h:form>
