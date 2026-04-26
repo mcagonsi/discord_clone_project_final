@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import discord_rest_api.models.DirectChat;
+import discord_rest_api.models.DirectMessage;
+import discord_rest_api.models.DirectMsgAttachment;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Produces;
@@ -71,6 +73,32 @@ public class DirectChats {
         return null;
     }
 
+    private DirectMsgAttachment getAttachmentFromMessageId(int id) {
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM direct_chat_msg_attachment WHERE direct_chat_msg_id=?;"
+            )
+        ) {
+            stmt.setInt(1, id);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                if (rs.next()) {
+                    DirectMsgAttachment attachment = new DirectMsgAttachment();
+                    attachment.setId(rs.getInt("id"));
+                    attachment.setDirectChatMessageId(id);
+                    attachment.setFilename(rs.getString("file_name"));
+                    attachment.setPath(rs.getString("file_path"));
+                    return attachment;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @POST
     @Path("list")
     @Produces("application/json")
@@ -104,6 +132,50 @@ public class DirectChats {
         } catch (SQLException e) {
             e.printStackTrace();
             response.put("message", "Failed to retrieve direct chats");
+        }
+        return response;
+    }
+
+    /*
+        TODO: Attachments need to be tested, not sure how I would do such
+    */
+    @POST
+    @Path("chatlog")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        int directChatId = Integer.parseInt(JSON.get("directChatId"));
+        List<DirectMessage> messages = new ArrayList<DirectMessage>();
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM direct_chat_messages WHERE conversation_id=? AND is_deleted=0;"
+            );
+        ) {
+            stmt.setInt(1, directChatId);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                while(rs.next()) {
+                    DirectMessage message = new DirectMessage();
+                    message.setAuthorId(rs.getInt("conversation_id"));
+                    message.setCreatedAt(rs.getString("created_at"));
+                    message.setContent(rs.getString("content"));
+                    message.setDirectChatId(directChatId);
+
+                    DirectMsgAttachment attachment = getAttachmentFromMessageId(rs.getInt("id"));
+                    if (attachment == null) {
+                        message.setAttachment(attachment);
+                    }
+
+                    messages.add(message);
+                }
+                response.put("chatlog", messages);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Failed to retrieve chatlog");
         }
         return response;
     }
