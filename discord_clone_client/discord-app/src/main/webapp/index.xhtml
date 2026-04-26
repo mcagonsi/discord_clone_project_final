@@ -24,12 +24,11 @@
                 'hidden'}">
                 <ui:include src="/WEB-INF/includes/create_server.xhtml" />
             </h:panelGroup>
-            <div class="min-h-[40vh] flex items-center justify-center py-8">
-                <h:panelGroup layout="block"
-                    styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'block px-4' : 'hidden'}">
-                    <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
-                </h:panelGroup>
-            </div>
+            <h:panelGroup layout="block"
+                styleClass="#{checkButtonToggleBean.activePanel eq 'DMs' ? 'fixed gap-6 top-24 left-[24rem] flex items-start' : 'hidden'}">
+                <ui:include src="/WEB-INF/includes/friends_list.xhtml" />
+                <ui:include src="/WEB-INF/includes/direct_message_menu.xhtml" />
+            </h:panelGroup>
             <h:panelGroup layout="block" styleClass="#{checkButtonToggleBean.activePanel eq 'currentServer' ? 
             'block fixed top-8 left-[12rem] text-white bg-white/20 backdrop-blur-md border border-white/30 
             text-white my-2 px-4 py-1 inline-flex items-center justify-center max-w-[400px]' : 'hidden'}">
