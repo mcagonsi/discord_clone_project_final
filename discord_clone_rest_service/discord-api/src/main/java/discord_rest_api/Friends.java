@@ -18,7 +18,7 @@ import jakarta.ws.rs.Produces;
 @Path("friends")
 public class Friends {
 
-    private User getUserIdFromUserUID(String user_uid) {
+    private User getUserFromUserUID(String user_uid) {
         try (
                 Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(
@@ -115,7 +115,7 @@ public class Friends {
     public HashMap<String, Object> getFriendsList(HashMap<String, String> JSON) {
         List<User> friends = new ArrayList<User>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         if (user == null) {
             response.put("message", "Invalid user credentials");
             return response;
@@ -157,7 +157,7 @@ public class Friends {
     @Consumes("application/json")
     public HashMap<String, Object> sendFriendRequest(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         User friend = getUserbyUsername(JSON.get("friend"));
 
         if (user == null) {
@@ -202,8 +202,8 @@ public class Friends {
     @Consumes("application/json")
     public HashMap<String, Object> acceptFriendRequest(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User sender = getUserIdFromUserUID(JSON.get("sender"));
-        User receiver = getUserIdFromUserUID(JSON.get("receiver"));
+        User sender = getUserFromUserUID(JSON.get("sender"));
+        User receiver = getUserFromUserUID(JSON.get("receiver"));
 
         try (
                 Connection conn = DatabaseConnection.getConnection();
@@ -241,7 +241,7 @@ public class Friends {
     @Consumes("application/json")
     public HashMap<String, Object> viewIncomingRequests(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         List<User> requests = new ArrayList<User>();
         try (
                 Connection conn = DatabaseConnection.getConnection();
