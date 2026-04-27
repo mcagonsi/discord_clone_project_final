@@ -40,13 +40,13 @@
           value="Refresh List"
           action="#{blockedUsers.loadBlockedUsers}"
           styleClass="rounded-md bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700">
-          <f:ajax execute="@this" render="blockedList messagePanel" />
+          <f:ajax execute="@this" render="blockedList blockMessagePanel" />
         </h:commandButton>
       </h:form>
     </div>
 
     <!-- Message -->
-    <h:panelGroup id="messagePanel" layout="block" styleClass="px-5 pt-3">
+    <h:panelGroup id="blockMessagePanel" layout="block" styleClass="px-5 pt-3">
       <h:outputText
         value="#{blockedUsers.message}"
         rendered="#{not empty blockedUsers.message}"
