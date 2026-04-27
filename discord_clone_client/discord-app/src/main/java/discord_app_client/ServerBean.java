@@ -199,7 +199,7 @@ public class ServerBean implements Serializable {
             WebTarget acceptInviteTarget = base.path("servers/join");
 
             HashMap<String, Object> requestBody = new HashMap<>();
-            requestBody.put("serverId", privateServer.getId().toString());
+            requestBody.put("serverId", (String) String.valueOf(privateServer.getId()));
             requestBody.put("inviteCode", privateServer.getInviteCode());
 
             HashMap<String, Object> user = new HashMap<>();
@@ -214,6 +214,7 @@ public class ServerBean implements Serializable {
                     .put(Entity.json(requestBody), HashMap.class);
 
             message = (String) response.get("message");
+            return null;
 
         } catch (Exception e) {
             e.printStackTrace();
