@@ -12,6 +12,7 @@ import discord_rest_api.models.DirectChat;
 import discord_rest_api.models.DirectMessage;
 import discord_rest_api.models.DirectMsgAttachment;
 import discord_rest_api.models.User;
+import discord_rest_api.utils.CommonGetters;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.Consumes;
@@ -21,32 +22,6 @@ import jakarta.ws.rs.Path;
 
 @Path("directchats")
 public class DirectChats {
-
-    private User getUserFromUserUID(String user_uid) {
-        try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE user_uid=?;"
-            )
-        ) {
-            stmt.setString(1, user_uid);
-            try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPasswordBytes(rs.getBytes("password"));
-                    return user;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private DirectChat getDirectChatFromId(int id) {
         try (
@@ -99,32 +74,6 @@ public class DirectChats {
         return null;
     }
 
-    private User getUserFromId(int id) {
-        try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE id=?;"
-            );
-        ) {
-            stmt.setInt(1, id);
-            try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setDisplay_name(rs.getString("display_name"));
-                    user.setEmail(rs.getString("email"));
-                    return user;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * Checks if the id is blocked by the current user
      * @param user current user
@@ -164,7 +113,7 @@ public class DirectChats {
     public HashMap<String, Object> getDirectChats(HashMap<String, String> JSON) {
         List<DirectChat> directChats = new ArrayList<DirectChat>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserFromUserUID(JSON.get("user_uid"));
+        User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -202,7 +151,7 @@ public class DirectChats {
     public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
         DirectChat directChat = getDirectChatFromId(Integer.parseInt(JSON.get("directChatId")));
-        User currentUser = getUserFromUserUID(JSON.get("user_uid"));
+        User currentUser = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         List<DirectMessage> messages = new ArrayList<DirectMessage>();
 
         int otherUserId;
@@ -211,7 +160,7 @@ public class DirectChats {
         } else {
             otherUserId = directChat.getSenderId();
         }
-        User otherUser = getUserFromId(otherUserId);
+        User otherUser = CommonGetters.getUserFromId(otherUserId);
         response.put("other_user", otherUser);
 
         try (
@@ -260,7 +209,7 @@ public class DirectChats {
     @Consumes("application/json")
     public HashMap<String, Object> sendDirectMessage(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserFromUserUID(JSON.get("user_uid"));
+        User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
