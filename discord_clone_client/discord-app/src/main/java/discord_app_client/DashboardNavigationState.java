@@ -27,6 +27,7 @@ public class DashboardNavigationState implements Serializable {
     private String mainContentPanel = "friendsPanel";
     private String mainContentTitle;
 
+    public static List<String> servers = Arrays.asList("Server 1", "Server 2", "Server 3");
     // defines and manage main content area side info on right
 
     public void toggleShowProfile() {
@@ -51,7 +52,11 @@ public class DashboardNavigationState implements Serializable {
 
     // just for testing
     public List<String> getServers() {
-        return Arrays.asList("Server 1", "Server 2", "Server 3");
+        return servers;
+    }
+
+    public void setServers(List<String> servers) {
+        this.servers = servers;
     }
 
     public List<String> getDirectMessages() {
