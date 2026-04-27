@@ -30,10 +30,10 @@
           action="#{serverBean.fetchServerInfo}"
           styleClass="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
         >
-        <f:ajax
-          execute="@form"
-          render="serverInfoDetails"
-        />
+          <f:ajax
+            execute="@form"
+            render="serverInfoDetails"
+          />
         </h:commandButton>
       </h:form>
     </div>
@@ -50,8 +50,10 @@
         <p>Invalid Invite Code</p>
       </h:panelGroup>
 
-      <div
-        class="flex items-center justify-between rounded-lg bg-gray-900 border border-gray-800 px-4 py-3 hover:bg-gray-800 transition"
+      <h:panelGroup
+        rendered="#{serverBean.privateServer != null and serverBean.privateServer.name != null}"
+        layout="block"
+        styleClass="flex items-center justify-between rounded-lg bg-gray-900 border border-gray-800 px-4 py-3 hover:bg-gray-800 transition"
       >
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
@@ -64,15 +66,31 @@
           </div>
         </div>
 
-        <h:form >
+        <h:form>
           <h:commandButton
             value="Join Server/Accept Invite"
-            action="#{serverBean.joinServer(serverBean.privateServer)}"
+            action="#{serverBean.acceptServerInviteOrJoinPrivateServer}"
             styleClass="text-xs bg-blue-700 hover:bg-blue-600 text-white px-2 py-1 rounded transition"
-          >  
+          >
+            <f:ajax
+              execute="@form"
+              render="joinPrivateServerMessagePanel"
+            />
           </h:commandButton>
         </h:form>
-      </div>
+      </h:panelGroup>
+    </h:panelGroup>
+
+    <h:panelGroup
+      id="joinPrivateServerMessagePanel"
+      rendered="#{not empty serverBean.message}"
+      layout="block"
+      styleClass="shrink-0 px-5 py-4 border-t border-gray-800 bg-green-900/20"
+    >
+      <h:outputText
+        value="#{serverBean.message}"
+        styleClass="text-sm text-green-400"
+      />
     </h:panelGroup>
   </h:panelGroup>
 </ui:composition>

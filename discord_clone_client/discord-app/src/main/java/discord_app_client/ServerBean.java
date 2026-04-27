@@ -171,7 +171,7 @@ public class ServerBean implements Serializable {
                     privateServer.setName((String) privateServerInfo.get("name"));
                     privateServer.setDescription((String) privateServerInfo.get("description"));
                     privateServer.setInviteCode((String) privateServerInfo.get("inviteCode"));
-                    privateServer.setId(Integer.parseInt((String) privateServerInfo.get("id")));
+                    privateServer.setId(((Number) privateServerInfo.get("id")).intValue());
                     privateServer.setPublicStatus((Boolean) privateServerInfo.get("public"));
                 }
                 else {
@@ -188,8 +188,37 @@ public class ServerBean implements Serializable {
         return null;
     }
 
-    public String acceptServerInviteOrJoinPrivateServer(HashMap<String, Object> server) {
-        System.out.println("acceptServerInviteOrJoinPrivateServer called with server: " + server);
+    public String acceptServerInviteOrJoinPrivateServer() {
+        System.out.println("acceptServerInviteOrJoinPrivateServer called");
+        if (privateServer == null) {
+            message = "No private server information available";
+            return null;
+        }
+
+        try {
+            WebTarget acceptInviteTarget = base.path("servers/join");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("serverId", privateServer.getId().toString());
+            requestBody.put("inviteCode", privateServer.getInviteCode());
+
+            HashMap<String, Object> user = new HashMap<>();
+            user.put("uid", sessionedUser.getUserUid());
+            user.put("token", sessionedUser.getToken());
+
+            requestBody.put("user", user);
+            System.out.println("Request Body: " + requestBody);
+
+            HashMap<String, Object> response = acceptInviteTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .put(Entity.json(requestBody), HashMap.class);
+
+            message = (String) response.get("message");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while accepting server invite";
+        }
         return null;
     }
 
