@@ -1,0 +1,18 @@
+package discord_app_client.models;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class Chat implements Serializable {
+    
+    private List<Message> messages;
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+}

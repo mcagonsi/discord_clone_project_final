@@ -175,7 +175,7 @@ public class DirectChats {
             ) {
                 while(rs.next()) {
                     DirectMessage message = new DirectMessage();
-                    message.setAuthorId(rs.getInt("conversation_id"));
+                    message.setAuthorId(rs.getInt("sender_user_id"));
                     message.setCreatedAt(rs.getString("created_at"));
                     message.setDirectChatId(directChat.getId());
                     message.setId(rs.getInt("id"));
@@ -202,7 +202,7 @@ public class DirectChats {
         return response;
     }
 
-    // TODO: add attachments
+
     @POST
     @Path("send")
     @Produces("application/json")
@@ -219,10 +219,21 @@ public class DirectChats {
             stmt.setInt(1, Integer.parseInt(JSON.get("conversationId")));
             stmt.setInt(2, user.getId());
             stmt.setString(3, JSON.get("content"));
-
+            
             int result = stmt.executeUpdate();
             if (result == 1) {
-                response.put("message", "Message sent successfully");
+                if(JSON.get("attachmentPath") != null && JSON.get("attachmentFilename") != null) {
+                    try (
+                        PreparedStatement attachmentStmt = conn.prepareStatement(
+                            "INSERT INTO direct_chat_msg_attachment (direct_chat_msg_id, file_name, file_path) VALUES (LAST_INSERT_ID(), ?, ?);"
+                        );
+                    ) {
+                        attachmentStmt.setString(1, JSON.get("attachmentFilename"));
+                        attachmentStmt.setString(2, JSON.get("attachmentPath"));
+                        attachmentStmt.executeUpdate();
+                    }
+                }
+                response.put("success", "Message sent successfully");
             } else {
                 response.put("message", "Could not send message");
             }

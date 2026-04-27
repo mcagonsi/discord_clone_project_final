@@ -3,6 +3,8 @@ package discord_app_client.models;
 import java.io.Serializable;
 
 public class User implements Serializable {
+
+    private int id;
     private String user_uid;
     private String display_name;
     private String username;
@@ -12,7 +14,12 @@ public class User implements Serializable {
     private String status;
     private String created_at;
 
-
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
     public String getUserUid() {
         return user_uid;
     }

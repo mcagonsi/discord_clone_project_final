@@ -15,7 +15,11 @@
           class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700 cursor-pointer text-metal"
         >
           <span class="text-2xl font-semibold">+</span>
-          <h:inputFile id="fileInput" styleClass="hidden" />
+          <h:inputFile
+            value="#{directChatBean.attachmentFile}"
+            id="fileInput"
+            styleClass="hidden"
+          />
         </label>
 
         <!-- Message input -->
@@ -23,9 +27,17 @@
           id="chatbox"
           placeholder="Type message..."
           style="height: fit-content"
+          value="#{directChatBean.messageContent}"
           styleClass="flex-1 bg-black/70 border border-gray-700 rounded-lg text-white placeholder-gray-500 px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition"
         />
       </div>
+      <h:commandButton
+        value="Send"
+        action="#{directChatBean.sendDirectChatMessage}"
+        styleClass="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg mt-2"
+      >
+        <f:ajax execute="@form" render=":chatPanelView @form " />
+      </h:commandButton>
     </h:form>
   </div>
 </ui:composition>

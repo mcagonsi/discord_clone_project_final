@@ -6,12 +6,13 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
   <div>
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3 mb-2">
+      <span class="text-sm text-gray-400 uppercase">User Options</span>
       <h:form>
         <h:commandButton
           action="#{dashboardNavigation.toggleMainContentPanel('friendsPanel')}"
           value="Friends List"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+          styleClass="w-full h-10 bg-gray-700 hover:bg-red-600 text-white rounded-lg"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
@@ -19,7 +20,7 @@
         <h:commandButton
           action="#{dashboardNavigation.toggleMainContentPanel('blockPanel')}"
           value="Block User"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg mt-2"
+          styleClass="w-full h-10 bg-gray-700 hover:bg-red-600 text-white rounded-lg mt-2"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
@@ -27,7 +28,7 @@
         <h:commandButton
           action="#{dashboardNavigation.toggleMainContentPanel('createServerPanel')}"
           value="Create Server"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg mt-2"
+          styleClass="w-full h-10 bg-gray-700 hover:bg-red-600 text-white rounded-lg mt-2"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
@@ -35,7 +36,7 @@
         <h:commandButton
           action="#{dashboardNavigation.toggleMainContentPanel('searchServersPanel')}"
           value="Search for Servers"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg mt-2"
+          styleClass="w-full h-10 bg-gray-700 hover:bg-red-600 text-white rounded-lg mt-2"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
@@ -43,7 +44,7 @@
         <h:commandButton
           action="#{dashboardNavigation.toggleMainContentPanel('joinServerPanel')}"
           value="Join a Private Server"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg mt-2"
+          styleClass="w-full h-10 bg-gray-700 hover:bg-red-600 text-white rounded-lg mt-2"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
@@ -51,16 +52,20 @@
     </div>
     <hr class="border-gray-600 my-2" />
     <h:form>
-      <div class="flex flex-col gap-2">
-      <ui:repeat value="#{dashboardNavigation.getDirectMessages()}" var="m">
+      <div class="flex flex-col gap-3">
+        <h:panelGroup layout="block">
+          <f:event type="preRenderComponent" listener="#{directChatBean.loadUsersDirectChats}" />
+          <h:outputText value="Direct Messages" styleClass="text-sm text-gray-400 uppercase" />
+      <ui:repeat value="#{directChatBean.userDirectChats}" var="dc">
         <h:commandButton
-          action="#{dashboardNavigation.toggleMainContentPanel('chatPanel')}"
-          value="#{m}"
-          styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-xl"
+          action="#{dashboardNavigation.toggleDirectChat(dc.key)}"
+          value="#{dc.value.username}"
+          styleClass="w-full h-10 bg-blue-700 hover:bg-gray-800 text-white rounded-md"
         >
           <f:ajax execute="@this" render=":mainContentPanel" />
         </h:commandButton>
       </ui:repeat>
+      </h:panelGroup>
     </div>
     </h:form>
   </div>

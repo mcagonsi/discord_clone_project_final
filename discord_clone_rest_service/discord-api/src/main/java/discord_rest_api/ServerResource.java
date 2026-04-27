@@ -279,7 +279,7 @@ public class ServerResource implements Serializable {
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
                     response.put("message", "Invite sent successfully.");
-                    boolean invitemsgsent = sendInviteDirectMessage(invitedUser, invitedByUser, serverId);
+                    boolean invitemsgsent = sendInviteDirectMessage(invitedByUser, invitedUser, serverId);
                 } else {
                     response.put("message", "Failed to send server invite. Have you sent an invite before?");
                 }
