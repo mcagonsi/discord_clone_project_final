@@ -40,9 +40,8 @@ public class CommonGetters {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle exceptions appropriately
         }
-        return null; // Placeholder return statement
+        return null;
     }
 
     /**

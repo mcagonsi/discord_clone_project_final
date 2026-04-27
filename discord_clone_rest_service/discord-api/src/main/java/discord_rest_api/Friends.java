@@ -92,37 +92,32 @@ public class Friends {
         User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         User friend = CommonGetters.getUserByUsername(JSON.get("friend"));
 
-        if (user == null) {
+        if (user == null || friend == null) {
             response.put("message", "Invalid user credentials");
             return response;
-        }
-        if (user != null && user.getUsername() == JSON.get("user_uid")) {
+        } else if (friend.getId() == user.getId()) {
             response.put("message", "Cannot send friend request to yourself");
             return response;
         } else {
-            if (friend != null) {
-                Integer existingRequest = checkIfFriendsOrRequestExists(user, friend);
-                if (existingRequest != null) {
-                    response.put("message",
-                            "Unable to send friend request, did you send one already? or are you already friends?");
-                    return response;
-                }
-                try (
-                        Connection conn = DatabaseConnection.getConnection();
-                        PreparedStatement stmt = conn.prepareStatement(
-                                "INSERT INTO friends (user_id, friend_user_id) VALUES (?, ?);")) {
-                    stmt.setInt(1, user.getId());
-                    stmt.setInt(2, friend.getId());
+            Integer existingRequest = checkIfFriendsOrRequestExists(user, friend);
+            if (existingRequest != null) {
+                response.put("message",
+                        "Unable to send friend request, did you send one already? or are you already friends?");
+                return response;
+            }
+            try (
+                    Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(
+                            "INSERT INTO friends (user_id, friend_user_id) VALUES (?, ?);")) {
+                stmt.setInt(1, user.getId());
+                stmt.setInt(2, friend.getId());
 
-                    stmt.execute();
+                stmt.execute();
 
-                    response.put("message", "Friend request sent!");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    response.put("message", "Failed to send friend request.");
-                }
-            } else {
-                response.put("message", "User with username " + JSON.get("friend") + " does not exist.");
+                response.put("message", "Friend request sent!");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                response.put("message", "Failed to send friend request.");
             }
         }
         return response;

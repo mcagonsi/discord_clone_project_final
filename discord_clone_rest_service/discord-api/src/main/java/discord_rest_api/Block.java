@@ -62,28 +62,27 @@ public class Block {
         User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         User userToBlock = CommonGetters.getUserByUsername(JSON.get("user_to_block"));
 
-        if (user == null) {
+        if (user == null || userToBlock == null) {
             response.put("message", "Invalid user credentials");
-        } else {
-            if (userToBlock != null) {
-                try (
-                    Connection conn = DatabaseConnection.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(
-                        "INSERT INTO blocked_users (user_id, blocked_user_id) VALUES (?, ?);"
-                    )
-                ) {
-                    stmt.setInt(1, user.getId());
-                    stmt.setInt(2, userToBlock.getId());
+        } else if (userToBlock.getId() == user.getId()) {
+            response.put("message", "Cannot block yourself");
+            return response;
+        }else {
+            try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO blocked_users (user_id, blocked_user_id) VALUES (?, ?);"
+                )
+            ) {
+                stmt.setInt(1, user.getId());
+                stmt.setInt(2, userToBlock.getId());
 
-                    stmt.execute();
+                stmt.execute();
 
-                    response.put("message", "User "+ JSON.get("user_to_block") +" was blocked successfully!");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    response.put("message", "Failed to block user");
-                }
-            } else {
-                response.put("message", "User with username "+ JSON.get("user_to_block") +" does not exist.");
+                response.put("message", "User "+ JSON.get("user_to_block") +" was blocked successfully!");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                response.put("message", "Failed to block user");
             }
         }
         return response;
