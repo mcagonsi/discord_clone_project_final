@@ -15,21 +15,14 @@ public class DashboardNavigationState implements Serializable {
     private boolean showProfile = false;
     private boolean showNotifications = false;
 
-    // defines the server Rails state
-    private String selectedServer;
-
     // defines the sidebar state and manages the views
     private String sideBarPanel = "DMs";
-    private String selectedChannel;
-    private String selectedDirectChat;
+    private int serverId;
 
     // defines and manages the state of the main content area
     private String mainContentPanel = "friendsPanel";
     private String mainContentTitle;
     private int directChatId;
-
-    public static List<String> servers = Arrays.asList("Server 1", "Server 2", "Server 3");
-    // defines and manage main content area side info on right
 
     public void toggleShowProfile() {
         this.showProfile = !this.showProfile;
@@ -57,22 +50,10 @@ public class DashboardNavigationState implements Serializable {
         System.out.println("Toggled Direct Chat with ID: " + chatId);
     }
 
-    // just for testing
-    public List<String> getServers() {
-        return servers;
-    }
-
-    public void setServers(List<String> servers) {
-        this.servers = servers;
-    }
-
-    public List<String> getDirectMessages() {
-        return Arrays.asList("DM 1", "DM 2", "DM 3");
-    }
-
-    public void selectServer(String server) {
-        this.selectedServer = server;
-        System.out.println("Selected Server: " + this.selectedServer);
+    public void toggleSelectedServer(int serverId) {
+        this.serverId = serverId;
+        this.sideBarPanel = "server";
+        System.out.println("Toggled Server with ID: " + serverId);
     }
 
     public boolean isShowProfile() {
@@ -116,4 +97,11 @@ public class DashboardNavigationState implements Serializable {
         this.directChatId = directChatId;
     }
 
+    public int getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(int serverId) {
+        this.serverId = serverId;
+    }
 }

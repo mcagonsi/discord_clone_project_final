@@ -23,7 +23,7 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 
 @Named("serverBean")
-@RequestScoped
+@SessionScoped
 public class ServerBean implements Serializable {
     private Client client;
     private WebTarget base;
@@ -46,6 +46,8 @@ public class ServerBean implements Serializable {
     private String message;
 
     private String searchQuery;
+
+    private List<Server> joinedServersList = new ArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -252,6 +254,53 @@ public class ServerBean implements Serializable {
         return null;
     }
 
+    public String fetchJoinedServers() {
+        System.out.println("fetchJoinedServers called");
+        if (sessionedUser == null) {
+            message = "User is not logged in";
+            return null;
+        }
+        if (sessionedUser!= null && sessionedUser.getUserUid() != null) {
+            
+            try {
+                WebTarget joinServersTarget = base.path("servers/joined");
+
+                HashMap<String, Object> requestBody = new HashMap<>();
+                requestBody.put("user_uid", sessionedUser.getUserUid());
+                requestBody.put("token", sessionedUser.getToken());
+                System.out.println("Request Body: " + requestBody);
+
+                HashMap<String, Object> response = joinServersTarget
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(Entity.json(requestBody), HashMap.class);
+
+               if (response.get("joinedServers") != null) {
+                //    joinedServersList.clear();
+                   for (HashMap<String, Object> serverInfo : (List<HashMap<String, Object>>) response.get("joinedServers")) {
+                       System.out.println("Joined Server Info: " + serverInfo);
+                       Server server = new Server();
+                       server.setName((String) serverInfo.get("name"));
+                       server.setDescription((String) serverInfo.get("description"));
+                       server.setInviteCode((String) serverInfo.get("inviteCode"));
+                       server.setId(((Number) serverInfo.get("id")).intValue());
+                       server.setPublicStatus((Boolean) serverInfo.get("public"));
+                       joinedServersList.add(server);
+                   }
+                }
+                else {
+                    message = (String) response.get("message");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Error occurred while creating server";
+            }
+
+        }
+        
+        return null;
+    }
+
     public List<Server> getServersSearchResult() {
         return publicServerSearchResults.getServers();
     }
@@ -313,5 +362,11 @@ public class ServerBean implements Serializable {
     }
     public void setPrivateServer(PrivateServerToJoin privateServer) {
         this.privateServer = privateServer;
+    }
+    public List<Server> getJoinedServersList() {
+        return joinedServersList;
+    }
+    public void setJoinedServersList(List<Server> joinedServersList) {
+        this.joinedServersList = joinedServersList;
     }
 }
