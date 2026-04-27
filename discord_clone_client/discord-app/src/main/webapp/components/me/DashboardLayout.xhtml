@@ -14,7 +14,7 @@
 
     <!-- Sidebar -->
     <aside  class="w-64 bg-gray-800 flex flex-col h-full min-h-0">
-      <ui:include src="/components/ui/sideNavigation/index.xhtml" />
+      <ui:include src="/components/sideNavigation/index.xhtml" />
     </aside>
 
     <!-- Main -->
@@ -28,18 +28,7 @@
       <!-- this section covers the chat and showing members info or receiver info -->
       <section class="flex-1 flex overflow-hidden min-h-0">
         <!-- Main Content -->
-        <div class="flex-1 min-h-0 flex flex-col">
-          <!-- Scrollable chat area -->
-          <div id="chatContent" class="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4">
-            <ui:insert name="content" />
-            chat contents show here
-          </div>
-
-          <!-- Chat input stays at the bottom of this column -->
-          <div id="chatInputContainer" class="shrink-0 w-full border-t border-gray-800 bg-black">
-            <ui:include src="/components/ui/chatInput.xhtml" />
-          </div>
-        </div>
+        <ui:include src="/components/mainContentArea/index.xhtml" />
 
         <!-- Members -->
         <aside class="w-64 bg-gray-900 p-4 overflow-auto min-h-0">

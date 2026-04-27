@@ -18,23 +18,21 @@ import jakarta.ws.rs.Produces;
 @Path("friends")
 public class Friends {
 
-    private User getUserIdFromUserUID(String user_uid) {
+    private User getUserFromUserUID(String user_uid) {
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE user_uid=?;"
-            )
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM users WHERE user_uid=?;")) {
             stmt.setString(1, user_uid);
             try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
+                    ResultSet rs = stmt.executeQuery();) {
                 if (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
                     user.setEmail(rs.getString("email"));
                     user.setPasswordBytes(rs.getBytes("password"));
+                    user.setStatus(rs.getString("status"));
                     return user;
                 }
             }
@@ -46,21 +44,19 @@ public class Friends {
 
     private User getUserFromId(int id) {
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE id=?;"
-            );
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM users WHERE id=?;");) {
             stmt.setInt(1, id);
             try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
+                    ResultSet rs = stmt.executeQuery();) {
                 if (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
                     user.setDisplay_name(rs.getString("display_name"));
                     user.setEmail(rs.getString("email"));
+                    user.setStatus(rs.getString("status"));
                     return user;
                 }
             }
@@ -73,11 +69,9 @@ public class Friends {
     private User getUserbyUsername(String username) {
         User user = null;
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE username = ?;"
-            )
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM users WHERE username = ?;")) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -93,6 +87,27 @@ public class Friends {
         return user;
     }
 
+    private Integer checkIfFriendsOrRequestExists(User user, User friend) {
+        try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM friends WHERE (user_id=? AND friend_user_id=?) OR (user_id=? AND friend_user_id=?);")) {
+            stmt.setInt(1, user.getId());
+            stmt.setInt(2, friend.getId());
+            stmt.setInt(3, friend.getId());
+            stmt.setInt(4, user.getId());
+            try (
+                    ResultSet rs = stmt.executeQuery();) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @POST
     @Path("list")
     @Produces("application/json")
@@ -100,22 +115,32 @@ public class Friends {
     public HashMap<String, Object> getFriendsList(HashMap<String, String> JSON) {
         List<User> friends = new ArrayList<User>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
+        if (user == null) {
+            response.put("message", "Invalid user credentials");
+            return response;
+        }
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT friend_user_id FROM friends WHERE user_id=? AND accepted=1;"
-            )
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT CASE " +
+                                "WHEN user_id = ? THEN friend_user_id " +
+                                "ELSE user_id " +
+                                "END AS friend_id " +
+                                "FROM friends " +
+                                "WHERE (user_id = ? OR friend_user_id = ?) AND accepted = 1")) {
             stmt.setInt(1, user.getId());
+            stmt.setInt(2, user.getId());
+            stmt.setInt(3, user.getId());
             try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
+                    ResultSet rs = stmt.executeQuery();) {
                 while (rs.next()) {
-                    User friend = getUserFromId(rs.getInt("friend_user_id"));
-                    if (friend != null) {
+                    User friend = getUserFromId(rs.getInt("friend_id"));
+
+                    if (friend != null && !(friend.getId() == user.getId())) {
                         friends.add(friend);
                     }
+
                 }
                 response.put("friendslist", friends);
             }
@@ -125,26 +150,35 @@ public class Friends {
         }
         return response;
     }
-    
+
     @POST
     @Path("sendRequest")
     @Produces("application/json")
     @Consumes("application/json")
     public HashMap<String, Object> sendFriendRequest(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         User friend = getUserbyUsername(JSON.get("friend"));
 
         if (user == null) {
             response.put("message", "Invalid user credentials");
+            return response;
+        }
+        if (user != null && user.getUsername() == JSON.get("user_uid")) {
+            response.put("message", "Cannot send friend request to yourself");
+            return response;
         } else {
             if (friend != null) {
+                Integer existingRequest = checkIfFriendsOrRequestExists(user, friend);
+                if (existingRequest != null) {
+                    response.put("message",
+                            "Unable to send friend request, did you send one already? or are you already friends?");
+                    return response;
+                }
                 try (
-                    Connection conn = DatabaseConnection.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(
-                        "INSERT INTO friends (user_id, friend_user_id) VALUES (?, ?);"
-                    )
-                ) {
+                        Connection conn = DatabaseConnection.getConnection();
+                        PreparedStatement stmt = conn.prepareStatement(
+                                "INSERT INTO friends (user_id, friend_user_id) VALUES (?, ?);")) {
                     stmt.setInt(1, user.getId());
                     stmt.setInt(2, friend.getId());
 
@@ -153,46 +187,42 @@ public class Friends {
                     response.put("message", "Friend request sent!");
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    response.put("message", "Unable to send friend request, did you send one already?.");
+                    response.put("message", "Failed to send friend request.");
                 }
             } else {
-                response.put("message", "User with username "+ JSON.get("friend") +" does not exist.");
+                response.put("message", "User with username " + JSON.get("friend") + " does not exist.");
             }
         }
         return response;
     }
 
-    //TODO: Maybe make this go both ways?
     @POST
     @Path("acceptRequest")
     @Produces("application/json")
     @Consumes("application/json")
     public HashMap<String, Object> acceptFriendRequest(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User sender = getUserIdFromUserUID(JSON.get("sender"));
-        User receiver = getUserIdFromUserUID(JSON.get("receiver"));
+        User sender = getUserFromUserUID(JSON.get("sender"));
+        User receiver = getUserFromUserUID(JSON.get("receiver"));
 
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM friends WHERE user_id=? AND friend_user_id=?;"
-            )
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM friends WHERE (user_id=? AND friend_user_id=?) OR (user_id=? AND friend_user_id=?);")) {
             stmt.setInt(1, sender.getId());
             stmt.setInt(2, receiver.getId());
+            stmt.setInt(3, receiver.getId());
+            stmt.setInt(4, sender.getId());
             try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
+                    ResultSet rs = stmt.executeQuery();) {
                 if (!rs.next()) {
                     response.put("message", "Friend request not found.");
                     return response;
                 }
                 int requestID = rs.getInt("id");
                 try (
-                    PreparedStatement stmt2 = conn.prepareStatement(
-                        "UPDATE friends SET accepted=1 WHERE id=?"
-                    )
-                ) {
+                        PreparedStatement stmt2 = conn.prepareStatement(
+                                "UPDATE friends SET accepted=1 WHERE id=?")) {
                     stmt2.setInt(1, requestID);
                     stmt2.execute();
                     response.put("message", "Friend request accepted!");
@@ -211,18 +241,15 @@ public class Friends {
     @Consumes("application/json")
     public HashMap<String, Object> viewIncomingRequests(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = getUserFromUserUID(JSON.get("user_uid"));
         List<User> requests = new ArrayList<User>();
         try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM friends WHERE friend_user_id=?;"
-            )
-        ) {
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM friends WHERE friend_user_id=? AND accepted=0;")) {
             stmt.setInt(1, user.getId());
             try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
+                    ResultSet rs = stmt.executeQuery();) {
                 while (rs.next()) {
                     User invite = getUserFromId(rs.getInt("user_id"));
                     if (invite != null) {

@@ -10,7 +10,7 @@
       <h:commandButton
         id="notificationsToggleBtn"
         value="Notifications"
-        action="#{dashboard.toggleShowNotifications}"
+        action="#{dashboardNavigation.toggleShowNotifications}"
         styleClass="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600 transition"
       >
         <f:ajax execute="@this" render="notificationsPanel" />
@@ -21,7 +21,7 @@
         layout="block"
         styleClass="absolute right-0 mt-2 w-300 h-full z-50"
       >
-        <ui:fragment rendered="#{dashboard.showNotifications}">
+        <ui:fragment rendered="#{dashboardNavigation.showNotifications}">
           <div
             class="rounded-xl border border-gray-700 bg-gray-900 shadow-lg p-4 space-y-4"
           >

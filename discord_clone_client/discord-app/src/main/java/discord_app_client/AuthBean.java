@@ -18,7 +18,7 @@ import discord_app_client.utils.Variables;
 import jakarta.inject.Inject;
 
 @Named("authBean")
-@SessionScoped
+@RequestScoped
 public class AuthBean implements Serializable {
     @Inject
     private SessionedUser loggedUser;
@@ -58,6 +58,10 @@ public class AuthBean implements Serializable {
         if (isLoggedIn()) {
             System.out.println("User is logged in: " + loggedUser.getUsername());
             return "/me/index.xhtml?faces-redirect=true";
+        }
+        if (!isLoggedIn()) {
+            System.out.println("User is not logged in.");
+            return "/index.xhtml?faces-redirect=true";
         }
         return null;
     }

@@ -11,9 +11,11 @@
     <title>Discord Juggernaut App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <h:outputStylesheet library="css" name="theme.css" />
+    <f:viewAction action="#{authBean.checkLoginStatus}" />
   </h:head>
 
   <h:body class="h-full flex flex-col bg-black m-0">
+    
     <header class="w-full h-12 border-b border-gray-800 bg-transparent z-20 shrink-0">
       <ui:include src="../components/me/titleBar.xhtml" />
     </header>
