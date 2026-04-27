@@ -2,8 +2,11 @@ package discord_rest_api;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
@@ -28,7 +31,7 @@ public class Channel {
         Server server = CommonGetters.getServerById(Integer.parseInt(JSON.get("server_id")));
         String channelName = JSON.get("channel_name");
         
-        if (CheckPermission.checkPermissionByName(user, server, PermissionConst.CREATE_CHANNEL)) {
+        if (CheckPermission.checkPermissionByName(user, server, PermissionConst.CREATE_CHANNEL) && server != null) {
             try (
                 Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(
@@ -51,7 +54,51 @@ public class Channel {
                 response.put("message", "Failed to create channel");
             }
         } else {
-            response.put("message", user.getDisplay_name() + " does not have permission to create channels in " + server.getName());
+            if (server != null) {
+                response.put("message", user.getDisplay_name() + " does not have permission to create channels in " + server.getName());
+            } else {
+                response.put("message", "Could not find server");
+            }
+        }
+        return response;
+    }
+
+    @POST
+    @Path("list")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> getChannelList(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        List<discord_rest_api.models.Channel> channels = new ArrayList<discord_rest_api.models.Channel>();
+        Server server = CommonGetters.getServerById(Integer.parseInt(JSON.get("server_id")));
+        if (server != null) {
+            try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT * FROM channels WHERE server_id=?"
+                );
+            ) {
+                stmt.setInt(1, server.getId());
+
+                try (
+                    ResultSet rs = stmt.executeQuery();
+                ) {
+                    while (rs.next()) {
+                        discord_rest_api.models.Channel channel = new discord_rest_api.models.Channel();
+                        channel.setId(rs.getInt("id"));
+                        channel.setName(rs.getString("name"));
+                        channel.setCreatedBy(rs.getInt("created_by"));
+                        channel.setServerId(rs.getInt("server_id"));
+                        channels.add(channel);
+                    }
+                    response.put("channels", channels);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            response.put("message", "Could not find server");
         }
         return response;
     }
