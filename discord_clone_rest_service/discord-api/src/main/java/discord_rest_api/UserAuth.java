@@ -9,10 +9,9 @@ import java.util.HashMap;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import discord_rest_api.models.User;
+import discord_rest_api.utils.CommonGetters;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
 
 @Path("/auth")
 public class UserAuth implements Serializable {
@@ -30,28 +29,6 @@ public class UserAuth implements Serializable {
                 PreparedStatement stmt = conn.prepareStatement(
                         "SELECT * FROM users WHERE email = ?;")) {
             stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPasswordBytes(rs.getBytes("password"));
-
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return user;
-    }
-
-    private User getUserbyUsername(String username) {
-        User user = null;
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT * FROM users WHERE username = ?;")) {
-            stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
@@ -227,7 +204,7 @@ public class UserAuth implements Serializable {
         if (user.getEmail() != null) {
             existingUser = getUserbyEmail(user.getEmail());
         } else if (user.getUsername() != null) {
-            existingUser = getUserbyUsername(user.getUsername());
+            existingUser = CommonGetters.getUserByUsername(user.getUsername());
         }
         if (existingUser == null) {
             System.out.println("User not found: " + user.getEmail());
