@@ -35,6 +35,11 @@ public class ServerBean implements Serializable {
     private String serverDescription;
     private boolean serverPublicStatus;
 
+    private String inviteLink;
+
+    @Inject
+    private PrivateServerToJoin privateServer;
+
     @Inject
     private PublicServerSearchResults publicServerSearchResults;
 
@@ -56,6 +61,18 @@ public class ServerBean implements Serializable {
         }
     }
 
+    private HashMap<String, String> extractIdAndinviteCodeFromInviteLink(String inviteLink) {
+        HashMap<String, String> result = new HashMap<>();
+        if (inviteLink != null && inviteLink.startsWith(Variables.DOMAIN_URL)) {
+            String path = inviteLink.substring(Variables.DOMAIN_URL.length()); // Slice out the domain
+            String[] parts = path.split("/");
+            if (parts.length >= 2) {
+                result.put("id", parts[0]);
+                result.put("inviteCode", parts[1]);
+            }
+        }
+        return result;
+    }
 
     public void clearSearchResults() {
         publicServerSearchResults.setServers(new ArrayList<>());
@@ -122,6 +139,86 @@ public class ServerBean implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
             message = "Error occurred while joining server";
+        }
+        return null;
+    }
+
+    public String fetchServerInfo() {
+        System.out.println("fetchServerInfo called");
+        if (inviteLink == null || inviteLink.trim().isEmpty()) {
+            message = "Please enter an invite link";
+            return null;
+        }
+        if (inviteLink != null && !inviteLink.trim().isEmpty()) {
+            HashMap<String, String> serverInfo = extractIdAndinviteCodeFromInviteLink(inviteLink);
+            System.out.println("Server Info: " + serverInfo);
+            try {
+                WebTarget serverInfoTarget = base.path("servers/info");
+
+                HashMap<String, Object> requestBody = new HashMap<>();
+                requestBody.put("serverId", serverInfo.get("id"));
+                requestBody.put("inviteCode", serverInfo.get("inviteCode"));
+                System.out.println("Request Body: " + requestBody);
+
+                HashMap<String, Object> response = serverInfoTarget
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(Entity.json(requestBody), HashMap.class);
+
+               
+                if (response.get("serverInfo") != null) {
+                    HashMap<String,Object>privateServerInfo = (HashMap<String,Object>) response.get("serverInfo");
+                    System.out.println("Private Server Info: " + privateServerInfo);
+                    privateServer.setName((String) privateServerInfo.get("name"));
+                    privateServer.setDescription((String) privateServerInfo.get("description"));
+                    privateServer.setInviteCode((String) privateServerInfo.get("inviteCode"));
+                    privateServer.setId(((Number) privateServerInfo.get("id")).intValue());
+                    privateServer.setPublicStatus((Boolean) privateServerInfo.get("public"));
+                }
+                else {
+                    message = (String) response.get("message");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Error occurred while creating server";
+            }
+
+        }
+        
+        return null;
+    }
+
+    public String acceptServerInviteOrJoinPrivateServer() {
+        System.out.println("acceptServerInviteOrJoinPrivateServer called");
+        if (privateServer == null) {
+            message = "No private server information available";
+            return null;
+        }
+
+        try {
+            WebTarget acceptInviteTarget = base.path("servers/join");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("serverId", (String) String.valueOf(privateServer.getId()));
+            requestBody.put("inviteCode", privateServer.getInviteCode());
+
+            HashMap<String, Object> user = new HashMap<>();
+            user.put("uid", sessionedUser.getUserUid());
+            user.put("token", sessionedUser.getToken());
+
+            requestBody.put("user", user);
+            System.out.println("Request Body: " + requestBody);
+
+            HashMap<String, Object> response = acceptInviteTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .put(Entity.json(requestBody), HashMap.class);
+
+            message = (String) response.get("message");
+            return null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while accepting server invite";
         }
         return null;
     }
@@ -201,5 +298,20 @@ public class ServerBean implements Serializable {
 
     public void setServerPublicStatus(boolean serverPublicStatus) {
         this.serverPublicStatus = serverPublicStatus;
+    }
+
+    public String getInviteLink() {
+        return inviteLink;
+    }
+
+    public void setInviteLink(String inviteLink) {
+        this.inviteLink = inviteLink;
+    }
+
+    public Server getPrivateServer() {
+        return privateServer;
+    }
+    public void setPrivateServer(PrivateServerToJoin privateServer) {
+        this.privateServer = privateServer;
     }
 }
