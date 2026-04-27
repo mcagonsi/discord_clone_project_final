@@ -2,9 +2,11 @@ package discord_rest_api;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import discord_rest_api.models.Permission;
 import discord_rest_api.models.Role;
 import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
@@ -19,19 +21,56 @@ import jakarta.ws.rs.Produces;
 @Path("roles")
 public class Roles {
 
-    private Role getRoleById(int id) {
+    private static Role getRoleById(int id) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM "
+                "SELECT * FROM roles WHERE id=?;"
             )
         ) {
-            
+            stmt.setInt(1, id);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                if (rs.next()) {
+                    Role role = new Role();
+                    role.setId(id);
+                    role.setServerId(rs.getInt("server_id"));
+                    role.setName(rs.getString("name"));
+                    return role;
+                } else {
+                    return null;
+                }
+            }
         } catch (SQLException e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
-        
-        Role role = new Role();
+        return null;
+    }
+
+    public static Permission getPermissionById(int id) {
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM permissions WHERE id=?;"
+            )
+        ) {
+            stmt.setInt(1, id);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                if (rs.next()) {
+                    Permission perm = new Permission();
+                    perm.setId(id);
+                    perm.setName(rs.getString("name"));
+                    return perm;
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -81,18 +120,54 @@ public class Roles {
     }
 
     @POST
-    @Path("manage")
+    @Path("givepermission")
     @Produces("application/json")
     @Consumes("application/json")
-    public HashMap<String, Object> alterRolePermissions(HashMap<String, String> JSON) {
+    public HashMap<String, Object> givePermissionToRole(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
         User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         Server server = CommonGetters.getServerById(Integer.parseInt(JSON.get("server_id")));
-        int roleId = Integer.parseInt(JSON.get("role_id"));
-        int permissionId = Integer.parseInt(JSON.get("permission_id"));
+        Role role = getRoleById(Integer.parseInt(JSON.get("role_id")));
+        Permission permission = getPermissionById(Integer.parseInt(JSON.get("permission_id")));
 
-        
+        if (user == null) {
+            response.put("message", "Invalid user credentials");
+        } else if (server == null) {
+            response.put("message", "Could not find server");
+        } else if (role == null) {
+            response.put("message", "Invalid role id");
+        } else if (permission == null) {
+            response.put("message", "Invalid permission id");
+        } else {
+            if (CheckPermission.checkPermissionByName(user, server, PermissionConst.MANAGE_ROLES) && server != null) {
+                try (
+                    Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(
+                        "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?);"
+                    )
+                ) {
+                    stmt.setInt(1, role.getId());
+                    stmt.setInt(2, permission.getId());
 
+                    int result = stmt.executeUpdate();
+                    if (result == 1) {
+                        response.put("message", "'" +role.getName() + "' now has the " + permission.getName() + " permission");
+                    } else {
+                        response.put("message", "Failed to update role");
+                    }
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    response.put("message", "Failed to update role, does it have this permission already?");
+                }
+            } else {
+                if (server != null) {
+                    response.put("message", user.getDisplay_name() + " does not have permission to manage roles in " + server.getName());
+                } else {
+                    response.put("message", "Could not find server");
+                }
+            }
+        }
         return response;
     }
 }
