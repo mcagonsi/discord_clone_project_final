@@ -7,7 +7,7 @@
   <h:form id="serverRailForm">
     <div id="serverRail" class="w-full gap-3 h-full flex flex-col items-center">
       <h:commandButton
-        action="#{dashboard.toggleServerRailOption('DMs')}"
+        action="#{dashboardNavigation.toggleSideBarPanel('DMs')}"
         value="DMs"
         styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg">
         <f:ajax execute="@this" render=":sideNav" />
@@ -15,9 +15,10 @@
 
       <hr class="w-full h-0.5 bg-gray-600" />
 
-      <ui:repeat value="#{dashboard.servers}" var="s">
+      <ui:repeat value="#{dashboardNavigation.getServers()}" var="s">
         <h:commandButton
-          action="#{dashboard.toggleServerRailOption('server')}"
+          action="#{dashboardNavigation.toggleSideBarPanel('server')}"
+          actionListener="#{dashboardNavigation.selectServer(s)}"
           value="#{s}"
           styleClass="w-full h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg">
           <f:ajax execute="@this" render=":sideNav" />
