@@ -37,7 +37,8 @@ public class ServerBean implements Serializable {
 
     private String inviteLink;
 
-    private Server privateServer;
+    @Inject
+    private PrivateServerToJoin privateServer;
 
     @Inject
     private PublicServerSearchResults publicServerSearchResults;
@@ -60,6 +61,18 @@ public class ServerBean implements Serializable {
         }
     }
 
+    private HashMap<String, String> extractIdAndinviteCodeFromInviteLink(String inviteLink) {
+        HashMap<String, String> result = new HashMap<>();
+        if (inviteLink != null && inviteLink.startsWith(Variables.DOMAIN_URL)) {
+            String path = inviteLink.substring(Variables.DOMAIN_URL.length()); // Slice out the domain
+            String[] parts = path.split("/");
+            if (parts.length >= 2) {
+                result.put("id", parts[0]);
+                result.put("inviteCode", parts[1]);
+            }
+        }
+        return result;
+    }
 
     public void clearSearchResults() {
         publicServerSearchResults.setServers(new ArrayList<>());
@@ -132,6 +145,46 @@ public class ServerBean implements Serializable {
 
     public String fetchServerInfo() {
         System.out.println("fetchServerInfo called");
+        if (inviteLink == null || inviteLink.trim().isEmpty()) {
+            message = "Please enter an invite link";
+            return null;
+        }
+        if (inviteLink != null && !inviteLink.trim().isEmpty()) {
+            HashMap<String, String> serverInfo = extractIdAndinviteCodeFromInviteLink(inviteLink);
+            System.out.println("Server Info: " + serverInfo);
+            try {
+                WebTarget serverInfoTarget = base.path("servers/info");
+
+                HashMap<String, Object> requestBody = new HashMap<>();
+                requestBody.put("serverId", serverInfo.get("id"));
+                requestBody.put("inviteCode", serverInfo.get("inviteCode"));
+                System.out.println("Request Body: " + requestBody);
+
+                HashMap<String, Object> response = serverInfoTarget
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(Entity.json(requestBody), HashMap.class);
+
+               
+                if (response.get("serverInfo") != null) {
+                    HashMap<String,Object>privateServerInfo = (HashMap<String,Object>) response.get("serverInfo");
+                    System.out.println("Private Server Info: " + privateServerInfo);
+                    privateServer.setName((String) privateServerInfo.get("name"));
+                    privateServer.setDescription((String) privateServerInfo.get("description"));
+                    privateServer.setInviteCode((String) privateServerInfo.get("inviteCode"));
+                    privateServer.setId(Integer.parseInt((String) privateServerInfo.get("id")));
+                    privateServer.setPublicStatus((Boolean) privateServerInfo.get("public"));
+                }
+                else {
+                    message = (String) response.get("message");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Error occurred while creating server";
+            }
+
+        }
+        
         return null;
     }
 
@@ -228,7 +281,7 @@ public class ServerBean implements Serializable {
     public Server getPrivateServer() {
         return privateServer;
     }
-    public void setPrivateServer(Server privateServer) {
+    public void setPrivateServer(PrivateServerToJoin privateServer) {
         this.privateServer = privateServer;
     }
 }
