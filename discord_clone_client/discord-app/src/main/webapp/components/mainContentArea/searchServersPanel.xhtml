@@ -32,6 +32,16 @@
             render="serversList serverSearchMessagePanel"
           />
         </h:commandButton>
+        <h:commandButton
+          value="Clear Search Results"
+          action="#{serverBean.clearSearchResults}"
+          styleClass="bg-indigo-700 hover:bg-indigo-400 text-white px-4 py-2 rounded transition"
+        >
+          <f:ajax
+            execute="@form"
+            render="serversList serverSearchMessagePanel"
+          />
+        </h:commandButton>
       </h:form>
     </div>
     <h:panelGroup
@@ -71,20 +81,18 @@
               <p class="text-xs text-gray-500">#{server.description}</p>
             </div>
           </div>
-       
+
           <h:form id="joinServerForm">
-            <ui:repeat value="#{serverBean.serversSearchResult}" var="server">
-              <h:commandButton
-                value="Join Server"
-                action="#{serverBean.joinServer(server)}"
-                styleClass="text-xs bg-blue-700 hover:bg-blue-600 text-white px-2 py-1 rounded transition"
-              >
-                <f:ajax
-                  execute="@form"
-                  render="serversList serverSearchMessagePanel :serverRail"
-                />
-              </h:commandButton>
-            </ui:repeat>
+            <h:commandButton
+              value="Join Server"
+              action="#{serverBean.joinServer(server)}"
+              styleClass="text-xs bg-blue-700 hover:bg-blue-600 text-white px-2 py-1 rounded transition"
+            >
+              <f:ajax
+                execute="@form"
+                render="serversList serverSearchMessagePanel :serverRail"
+              />
+            </h:commandButton>
           </h:form>
         </div>
       </ui:repeat>

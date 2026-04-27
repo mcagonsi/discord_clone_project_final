@@ -31,10 +31,13 @@ public class ServerBean implements Serializable {
     @Inject
     private SessionedUser sessionedUser;
 
-    private Server server;
-    
-    @Inject private PublicServerSearchResults publicServerSearchResults;
-    
+    private String serverName;
+    private String serverDescription;
+    private boolean serverPublicStatus;
+
+    @Inject
+    private PublicServerSearchResults publicServerSearchResults;
+
     private String message;
 
     private String searchQuery;
@@ -43,6 +46,7 @@ public class ServerBean implements Serializable {
     public void init() {
         client = ClientBuilder.newClient();
         base = client.target(Variables.API_URL);
+
     }
 
     @PreDestroy
@@ -50,6 +54,12 @@ public class ServerBean implements Serializable {
         if (client != null) {
             client.close();
         }
+    }
+
+
+    public void clearSearchResults() {
+        publicServerSearchResults.setServers(new ArrayList<>());
+        message = null;
     }
 
     public String searchPublicServers() {
@@ -80,10 +90,10 @@ public class ServerBean implements Serializable {
 
         return null;
     }
-    
+
     public String joinServer(HashMap<String, Object> server) {
         System.out.println("joinServer called with server: " + server);
-        if(server == null) {
+        if (server == null) {
             message = "Invalid server selected";
             return null;
         }
@@ -107,14 +117,40 @@ public class ServerBean implements Serializable {
                     .request(MediaType.APPLICATION_JSON)
                     .put(Entity.json(requestBody), HashMap.class);
 
-            
             message = (String) response.get("message");
-            
-           
 
         } catch (Exception e) {
             e.printStackTrace();
             message = "Error occurred while joining server";
+        }
+        return null;
+    }
+
+    public String createServer() {
+        System.out.println("createServer called with server: " + serverName);
+
+        try {
+        WebTarget createsServerTarget = base.path("servers/create");
+
+        HashMap<String, Object> requestBody = new HashMap<>();
+        requestBody.put("user_uid", sessionedUser.getUserUid());
+        requestBody.put("token", sessionedUser.getToken());
+        requestBody.put("name", serverName);
+        requestBody.put("description", serverDescription);
+        requestBody.put("is_public", serverPublicStatus ? true : false);
+
+        
+        System.out.println("Request Body: " + requestBody);
+
+        HashMap<String, Object> response = createsServerTarget
+        .request(MediaType.APPLICATION_JSON)
+        .post(Entity.json(requestBody), HashMap.class);
+
+        message = (String) response.get("message");
+
+        } catch (Exception e) {
+        e.printStackTrace();
+        message = "Error occurred while creating server";
         }
         return null;
     }
@@ -143,11 +179,27 @@ public class ServerBean implements Serializable {
         this.searchQuery = searchQuery;
     }
 
-    public Server getServer() {
-        return server;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getServerDescription() {
+        return serverDescription;
+    }
+
+    public void setServerDescription(String serverDescription) {
+        this.serverDescription = serverDescription;
+    }
+
+    public boolean isServerPublicStatus() {
+        return serverPublicStatus;
+    }
+
+    public void setServerPublicStatus(boolean serverPublicStatus) {
+        this.serverPublicStatus = serverPublicStatus;
     }
 }

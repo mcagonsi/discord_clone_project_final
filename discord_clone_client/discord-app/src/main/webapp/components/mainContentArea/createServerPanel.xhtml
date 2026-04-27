@@ -1,0 +1,70 @@
+<ui:composition
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+  <h:panelGroup
+    id="createServerPanel"
+    layout="block"
+    styleClass="h-full min-h-0 flex flex-col bg-gray-950 text-gray-100"
+  >
+    <!-- Header -->
+    <div class="shrink-0 border-b border-gray-800 px-5 py-4">
+      <h2 class="text-lg font-semibold">Create Server</h2>
+      <p class="text-sm text-gray-400">
+        Create a new server for your community.
+      </p>
+    </div>
+
+    <div class="shrink-0 px-5 py-5 border-b border-gray-800">
+      <h:form styleClass="max-w-xl flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-300">Server Name</label>
+          <h:inputText
+            value="#{serverBean.serverName}"
+            styleClass="w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-gray-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            placeholder="Enter server name"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-300">Description</label>
+          <h:inputTextarea
+            value="#{serverBean.serverDescription}"
+            rows="4"
+            styleClass="w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-gray-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
+            placeholder="Describe what this server is about"
+          />
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-300">
+          <h:selectBooleanCheckbox
+            value="#{serverBean.serverPublicStatus}"
+            styleClass="h-4 w-4 rounded border-gray-600 bg-gray-900 text-indigo-600 focus:ring-indigo-500"
+          />
+          Make server public
+        </label>
+
+        <h:commandButton
+          value="Create Server"
+          action="#{serverBean.createServer}"
+          styleClass="w-fit rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+        >
+          <f:ajax execute="@form" render="createServerMessagePanel" />
+        </h:commandButton>
+
+        <h:panelGroup id="createServerMessagePanel" layout="block">
+          <h:outputText
+            value="#{serverBean.message}"
+            rendered="#{not empty serverBean.message}"
+            styleClass="text-sm text-red-400"
+          />
+        </h:panelGroup>
+      </h:form>
+    </div>
+
+    <!-- Message -->
+  </h:panelGroup>
+</ui:composition>

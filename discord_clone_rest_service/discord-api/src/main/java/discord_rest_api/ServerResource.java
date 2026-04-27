@@ -222,17 +222,17 @@ public class ServerResource implements Serializable {
         User owner = getUserFromUid(user_uid);
         if (owner == null) {
             System.out.println("User not found for user_uid: " + user_uid);
-            response.put("error", "User not found");
+            response.put("message", "User not found or bad credentials");
             return response;
         }
         if (!User.isValidUser(owner, token)) {
             System.out.println("Invalid token for user_uid: " + user_uid);
-            response.put("error", "Invalid token");
+            response.put("message", "Invalid token");
             return response;
         }
         if (!request.containsKey("name") || !request.containsKey("description") || !request.containsKey("is_public")) {
             System.out.println("Missing required fields for server creation");
-            response.put("error", "Missing required fields");
+            response.put("message", "Missing required fields");
             return response;
         }
         try (Connection conn = DatabaseConnection.getConnection();
