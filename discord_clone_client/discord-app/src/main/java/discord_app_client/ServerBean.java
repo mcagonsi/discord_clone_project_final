@@ -35,6 +35,10 @@ public class ServerBean implements Serializable {
     private String serverDescription;
     private boolean serverPublicStatus;
 
+    private String inviteLink;
+
+    private Server privateServer;
+
     @Inject
     private PublicServerSearchResults publicServerSearchResults;
 
@@ -126,6 +130,16 @@ public class ServerBean implements Serializable {
         return null;
     }
 
+    public String fetchServerInfo() {
+        System.out.println("fetchServerInfo called");
+        return null;
+    }
+
+    public String acceptServerInviteOrJoinPrivateServer(HashMap<String, Object> server) {
+        System.out.println("acceptServerInviteOrJoinPrivateServer called with server: " + server);
+        return null;
+    }
+
     public String createServer() {
         System.out.println("createServer called with server: " + serverName);
 
@@ -201,5 +215,20 @@ public class ServerBean implements Serializable {
 
     public void setServerPublicStatus(boolean serverPublicStatus) {
         this.serverPublicStatus = serverPublicStatus;
+    }
+
+    public String getInviteLink() {
+        return inviteLink;
+    }
+
+    public void setInviteLink(String inviteLink) {
+        this.inviteLink = inviteLink;
+    }
+
+    public Server getPrivateServer() {
+        return privateServer;
+    }
+    public void setPrivateServer(Server privateServer) {
+        this.privateServer = privateServer;
     }
 }

@@ -487,6 +487,50 @@ public class ServerResource implements Serializable {
             response.put("message", "Error occurred while joining the server.");
         }
         return response;
-    }
+    };
+
+
+    @POST
+    @Path("/info")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public HashMap<String, Object> searchServerInfo(HashMap<String, Object> request) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        
+        String serverId = (String) request.get("serverId");
+        String inviteCode = (String) request.get("inviteCode");
+        if (serverId == null || serverId.trim().isEmpty() || inviteCode == null || inviteCode.trim().isEmpty()) {
+            System.out.println("Server ID and invite code cannot be null or empty");
+            response.put("message", "Server ID and invite code cannot be null or empty");
+            return response;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM servers WHERE id = ? AND invite_code = ?")) {
+            stmt.setString(1, serverId);
+            stmt.setString(2, inviteCode);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Server server = new Server();
+                    server.setId(rs.getInt("id"));
+                    server.setName(rs.getString("name"));
+                    server.setDescription(rs.getString("description"));
+                    server.setCreatedAt(rs.getTimestamp("created_at").toString());
+                    server.setOwnerId(rs.getInt("owner_id"));
+                    server.setPublic(rs.getBoolean("isPublic"));
+                    server.setInviteCode(rs.getString("invite_code"));
+                    
+                    response.put("serverInfo", server);
+                }
+                return response;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "An error occurred while searching for servers.");
+        }
+        return response;
+    };
 
 }
