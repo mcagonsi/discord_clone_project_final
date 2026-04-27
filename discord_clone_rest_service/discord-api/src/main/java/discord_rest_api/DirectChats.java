@@ -99,6 +99,64 @@ public class DirectChats {
         return null;
     }
 
+    private User getUserFromId(int id) {
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM users WHERE id=?;"
+            );
+        ) {
+            stmt.setInt(1, id);
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setDisplay_name(rs.getString("display_name"));
+                    user.setEmail(rs.getString("email"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the id is blocked by the current user
+     * @param user current user
+     * @param id id to check if blocked
+     * @return true or false
+     */
+    private boolean checkIfBlocked(User user, int id) {
+        boolean result = false;
+
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT blocked_user_id FROM blocked_users WHERE user_id=?;"
+            );
+        ) {
+            stmt.setInt(1, user.getId());
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                while(rs.next()) {
+                    if (rs.getInt("blocked_user_id") == id) {
+                        result = true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();;
+        }
+
+        return result;
+    }
+
     @POST
     @Path("list")
     @Produces("application/json")
@@ -136,24 +194,33 @@ public class DirectChats {
         return response;
     }
 
-    /*
-        TODO: Attachments need to be tested, not sure how I would do such
-    */
+    //TODO: Attachments need to be tested, not sure how I would do such
     @POST
     @Path("chatlog")
     @Produces("application/json")
     @Consumes("application/json")
     public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        int directChatId = Integer.parseInt(JSON.get("directChatId"));
+        DirectChat directChat = getDirectChatFromId(Integer.parseInt(JSON.get("directChatId")));
+        User currentUser = getUserFromUserUID(JSON.get("user_uid"));
         List<DirectMessage> messages = new ArrayList<DirectMessage>();
+
+        int otherUserId;
+        if (currentUser.getId() == directChat.getSenderId()) {
+            otherUserId = directChat.getReceiverId();
+        } else {
+            otherUserId = directChat.getSenderId();
+        }
+        User otherUser = getUserFromId(otherUserId);
+        response.put("other_user", otherUser);
+
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
                 "SELECT * FROM direct_chat_messages WHERE conversation_id=? AND is_deleted=0;"
             );
         ) {
-            stmt.setInt(1, directChatId);
+            stmt.setInt(1, directChat.getId());
             try (
                 ResultSet rs = stmt.executeQuery();
             ) {
@@ -161,8 +228,14 @@ public class DirectChats {
                     DirectMessage message = new DirectMessage();
                     message.setAuthorId(rs.getInt("conversation_id"));
                     message.setCreatedAt(rs.getString("created_at"));
-                    message.setContent(rs.getString("content"));
-                    message.setDirectChatId(directChatId);
+                    message.setDirectChatId(directChat.getId());
+                    message.setId(rs.getInt("id"));
+
+                    if (!checkIfBlocked(currentUser, otherUserId)) {
+                        message.setContent(rs.getString("content"));
+                    } else {
+                        message.setContent("<You blocked this user>");
+                    }
 
                     DirectMsgAttachment attachment = getAttachmentFromMessageId(rs.getInt("id"));
                     if (attachment == null) {
