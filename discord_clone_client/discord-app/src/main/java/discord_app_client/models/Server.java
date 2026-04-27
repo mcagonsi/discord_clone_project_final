@@ -10,7 +10,7 @@ public class Server implements Serializable {
     private String description;
     private int ownerId;
     private String created_at;
-    private boolean isPublic;
+    private boolean publicStatus;
     private String invite_code;
 
     // Getters and Setters
@@ -55,11 +55,11 @@ public class Server implements Serializable {
     }
 
     public boolean isPublic() {
-        return isPublic;
+        return publicStatus;
     }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setPublicStatus(boolean publicStatus) {
+        this.publicStatus = publicStatus;
     }
 
     public String getInviteCode() {

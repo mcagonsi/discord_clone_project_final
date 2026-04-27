@@ -24,12 +24,12 @@
     </h:panelGroup>
 
     <h:panelGroup
-      id="createServerPanel"
+      id="createServerViewPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
       rendered="#{dashboardNavigation.mainContentPanel == 'createServerPanel'}"
     >
-      <p>Create Server</p>
+      <ui:include src="createServerPanel.xhtml" />
     </h:panelGroup>
 
     <h:panelGroup
