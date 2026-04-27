@@ -291,7 +291,7 @@ public class ServerResource implements Serializable {
     }
 
     @PUT
-    @Path("/join/")
+    @Path("/join")
     @Consumes("application/json")
     @Produces("application/json")
     public HashMap<String, Object> joinServer(HashMap<String, Object> request) {
@@ -438,6 +438,51 @@ public class ServerResource implements Serializable {
                     
                     response.put("serverInfo", server);
                 }
+                return response;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "An error occurred while searching for servers.");
+        }
+        return response;
+    };
+
+    @POST
+    @Path("/joined")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public HashMap<String, Object> serversJoinedByUser(HashMap<String, Object> request) {
+        HashMap<String, Object> response = new HashMap<>();
+
+
+        String user_uid = (String) request.get("user_uid");
+        String token = (String) request.get("token");
+        if (user_uid == null || user_uid.trim().isEmpty() || token == null || token.trim().isEmpty()) {
+            System.out.println("User ID and token cannot be null or empty");
+            response.put("message", "User ID and token cannot be null or empty");
+            return response;
+        }
+        User user = CommonGetters.getUserFromUserUID(user_uid);
+        if (user == null || !User.isValidUser(user, token)) {
+            System.out.println("Invalid user or token.");
+            response.put("message", "Invalid user or token.");
+            return response;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT server_id FROM server_members WHERE user_id = ?")) {
+            stmt.setInt(1, user.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Server> joinedServers = new ArrayList<>();
+                while (rs.next()) {
+                    int serverId = rs.getInt("server_id");
+                    Server server = CommonGetters.getServerById(serverId);
+                    if (server != null) {
+                        joinedServers.add(server);
+                    }
+                }
+                response.put("joinedServers", joinedServers);
                 return response;
             }
         } catch (Exception e) {
