@@ -51,16 +51,14 @@
     </h:panelGroup>
 
     <h:panelGroup
-      id="friendsListPanel"
+      id="friendsViewPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
       rendered="#{dashboardNavigation.mainContentPanel == 'friendsPanel'}"
     >
-    <h:form>
-      <h:commandButton value="Load Friends" action="#{userFriends.loadFriendsList}" >
-        <f:ajax execute="@this" render="friendsListPanel" />
-      </h:commandButton>
-    </h:form>
+    
+      <ui:include src="friendsPanel.xhtml" />
+    
       
     </h:panelGroup>
   </h:panelGroup>

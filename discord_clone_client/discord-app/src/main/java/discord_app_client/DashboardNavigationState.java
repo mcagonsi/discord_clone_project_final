@@ -24,7 +24,7 @@ public class DashboardNavigationState implements Serializable {
     private String selectedDirectChat;
 
     // defines and manages the state of the main content area
-    private String mainContentPanel = "chatPanel";
+    private String mainContentPanel = "friendsPanel";
     private String mainContentTitle;
 
     // defines and manage main content area side info on right
