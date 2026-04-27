@@ -26,6 +26,7 @@ public class DashboardNavigationState implements Serializable {
     // defines and manages the state of the main content area
     private String mainContentPanel = "friendsPanel";
     private String mainContentTitle;
+    private int directChatId;
 
     public static List<String> servers = Arrays.asList("Server 1", "Server 2", "Server 3");
     // defines and manage main content area side info on right
@@ -48,6 +49,12 @@ public class DashboardNavigationState implements Serializable {
     public void toggleMainContentPanel(String panel) {
         this.mainContentPanel = panel;
         System.out.println("Main Content Panel: " + this.mainContentPanel);
+    }
+
+    public void toggleDirectChat(int chatId) {
+        this.directChatId = chatId;
+        this.mainContentPanel = "chatPanel";
+        System.out.println("Toggled Direct Chat with ID: " + chatId);
     }
 
     // just for testing
@@ -99,6 +106,14 @@ public class DashboardNavigationState implements Serializable {
 
     public void setMainContentPanel(String mainContentPanel) {
         this.mainContentPanel = mainContentPanel;
+    }
+
+    public int getDirectChatId() {
+        return directChatId;
+    }
+
+    public void setDirectChatId(int directChatId) {
+        this.directChatId = directChatId;
     }
 
 }

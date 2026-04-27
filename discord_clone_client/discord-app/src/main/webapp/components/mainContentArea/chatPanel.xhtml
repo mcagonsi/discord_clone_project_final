@@ -6,21 +6,37 @@
   xmlns:f="http://xmlns.jcp.org/jsf/core"
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
- 
-    <div
-      id="chatContent"
-      class="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
-    >
-      <ui:insert name="content" />
-      chat contents show here
-    </div>
+  <f:event
+    type="preRenderComponent"
+    listener="#{directChatBean.loadDirectChatMessages}"
+  />
+  <h:panelGroup
+    id="chatPanelView"
+    layout="block"
+    styleClass="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
+  >
+    <ui:repeat value="#{directChatBean.directChatMessages}" var="message">
+      <div class="flex items-start gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-300">
+              @#{message.authorId == directChatBean.getSessionedUser().getId() ?
+              directChatBean.getSessionedUser().getUsername() :
+              directChatBean.chattingWith.username}
+            </span>
+            <span class="text-xs text-gray-500">#{message.createdAt}</span>
+          </div>
+          <p class="text-sm text-gray-200 mt-1">#{message.content}</p>
+        </div>
+      </div>
+    </ui:repeat>
+  </h:panelGroup>
 
-    <!-- Chat input stays at the bottom of this column -->
-    <div
-      id="chatInputContainer"
-      class="shrink-0 w-full border-t border-gray-800 bg-black"
-    >
-      <ui:include src="/components/ui/chatInput.xhtml" />
-    </div>
-  
+  <!-- Chat input stays at the bottom of this column -->
+  <div
+    id="chatInputContainer"
+    class="shrink-0 w-full border-t border-gray-800 bg-black"
+  >
+    <ui:include src="/components/ui/chatInput.xhtml" />
+  </div>
 </ui:composition>

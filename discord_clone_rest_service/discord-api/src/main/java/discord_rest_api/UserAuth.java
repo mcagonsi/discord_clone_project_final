@@ -86,6 +86,7 @@ public class UserAuth implements Serializable {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     User updatedUser = new User();
+                    updatedUser.setId(user.getId());
                     updatedUser.setUid(rs.getString("user_uid"));
                     updatedUser.setDisplay_name(rs.getString("display_name"));
                     updatedUser.setUsername(rs.getString("username"));
@@ -230,6 +231,45 @@ public class UserAuth implements Serializable {
             message = "Something went wrong during login.";
             response.put("message", message);
         }
+        return response;
+    }
+
+    @POST
+    @Path("/userinfo")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public HashMap<String, Object> getQuickUserInfo(HashMap<String, Object> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        int user_id = Integer.parseInt((String) JSON.get("id"));
+        if (user_id == 0    ) {
+            System.out.println("User ID is required for user info.");
+            response.put("message", "User ID is required.");
+            return response;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT user_uid, display_name, username, email FROM users WHERE id = ?;")) {
+            stmt.setInt(1, user_id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUid(rs.getString("user_uid"));
+                user.setDisplay_name(rs.getString("display_name"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                response.put("user", user);
+            } else {
+                System.out.println("User not found: " + user_id);
+                response.put("message", "User not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "Error occurred while fetching user info.");
+        }
+        
+      
         return response;
     }
 

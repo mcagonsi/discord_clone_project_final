@@ -97,6 +97,7 @@ public class AuthBean implements Serializable {
             if (response.containsKey("user")) {
 
                 HashMap<String, Object> userMap = (HashMap<String, Object>) response.get("user");
+                loggedUser.setId(((Number) userMap.get("id")).intValue());
                 loggedUser.setUserUid(userMap.get("uid").toString());
                 loggedUser.setCreated_at(userMap.get("created_at").toString());
                 loggedUser.setDisplay_name(userMap.get("display_name").toString());
