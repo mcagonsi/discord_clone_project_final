@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.print.attribute.standard.Media;
 
 import discord_app_client.models.User;
 import discord_app_client.utils.Variables;
@@ -22,7 +21,7 @@ import jakarta.ws.rs.core.MediaType;
 
 @Named("userFriendsBean")
 @RequestScoped
-public class UserFriends implements Serializable{
+public class FriendsBean implements Serializable{
     @Inject
     private SessionedUser sessionedUser;
     private String username;

@@ -5,7 +5,7 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
   <h:form id="serverRailForm">
-    <div id="serverRail" class="w-full gap-3 h-full flex flex-col items-center">
+    <h:panelGroup id="serverRail" styleClass="w-full gap-3 h-full flex flex-col items-center">
       <h:commandButton
         action="#{dashboardNavigation.toggleSideBarPanel('DMs')}"
         value="DMs"
@@ -24,6 +24,6 @@
           <f:ajax execute="@this" render=":sideNav" />
         </h:commandButton>
       </ui:repeat>
-    </div>
+    </h:panelGroup>
   </h:form>
 </ui:composition>

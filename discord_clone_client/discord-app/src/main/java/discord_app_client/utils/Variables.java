@@ -4,5 +4,6 @@ public class Variables {
 
     public static final String API_URL = "http://localhost:8080/discord-api";
     public static final String MEDIA_TYPE = "application/json";
+    public static final String DOMAIN_URL = "http://localhost:8080/discord-app/";
 
 }
