@@ -12,6 +12,7 @@ import discord_rest_api.models.DirectChat;
 import discord_rest_api.models.DirectMessage;
 import discord_rest_api.models.DirectMsgAttachment;
 import discord_rest_api.models.User;
+import discord_rest_api.utils.CommonGetters;
 import discord_rest_api.utils.DatabaseConnection;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.Consumes;
@@ -21,32 +22,6 @@ import jakarta.ws.rs.Path;
 
 @Path("directchats")
 public class DirectChats {
-
-    private User getUserIdFromUserUID(String user_uid) {
-        try (
-            Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE user_uid=?;"
-            )
-        ) {
-            stmt.setString(1, user_uid);
-            try (
-                ResultSet rs = stmt.executeQuery();
-            ) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPasswordBytes(rs.getBytes("password"));
-                    return user;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private DirectChat getDirectChatFromId(int id) {
         try (
@@ -99,6 +74,38 @@ public class DirectChats {
         return null;
     }
 
+    /**
+     * Checks if the id is blocked by the current user
+     * @param user current user
+     * @param id id to check if blocked
+     * @return true or false
+     */
+    private boolean checkIfBlocked(User user, int id) {
+        boolean result = false;
+
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT blocked_user_id FROM blocked_users WHERE user_id=?;"
+            );
+        ) {
+            stmt.setInt(1, user.getId());
+            try (
+                ResultSet rs = stmt.executeQuery();
+            ) {
+                while(rs.next()) {
+                    if (rs.getInt("blocked_user_id") == id) {
+                        result = true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();;
+        }
+
+        return result;
+    }
+
     @POST
     @Path("list")
     @Produces("application/json")
@@ -106,7 +113,7 @@ public class DirectChats {
     public HashMap<String, Object> getDirectChats(HashMap<String, String> JSON) {
         List<DirectChat> directChats = new ArrayList<DirectChat>();
         HashMap<String, Object> response = new HashMap<>();
-        User user = getUserIdFromUserUID(JSON.get("user_uid"));
+        User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -136,24 +143,33 @@ public class DirectChats {
         return response;
     }
 
-    /*
-        TODO: Attachments need to be tested, not sure how I would do such
-    */
+    //TODO: Attachments need to be tested, not sure how I would do such
     @POST
     @Path("chatlog")
     @Produces("application/json")
     @Consumes("application/json")
     public HashMap<String, Object> getDirectChatLog(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        int directChatId = Integer.parseInt(JSON.get("directChatId"));
+        DirectChat directChat = getDirectChatFromId(Integer.parseInt(JSON.get("directChatId")));
+        User currentUser = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
         List<DirectMessage> messages = new ArrayList<DirectMessage>();
+
+        int otherUserId;
+        if (currentUser.getId() == directChat.getSenderId()) {
+            otherUserId = directChat.getReceiverId();
+        } else {
+            otherUserId = directChat.getSenderId();
+        }
+        User otherUser = CommonGetters.getUserFromId(otherUserId);
+        response.put("other_user", otherUser);
+
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
                 "SELECT * FROM direct_chat_messages WHERE conversation_id=? AND is_deleted=0;"
             );
         ) {
-            stmt.setInt(1, directChatId);
+            stmt.setInt(1, directChat.getId());
             try (
                 ResultSet rs = stmt.executeQuery();
             ) {
@@ -161,8 +177,14 @@ public class DirectChats {
                     DirectMessage message = new DirectMessage();
                     message.setAuthorId(rs.getInt("conversation_id"));
                     message.setCreatedAt(rs.getString("created_at"));
-                    message.setContent(rs.getString("content"));
-                    message.setDirectChatId(directChatId);
+                    message.setDirectChatId(directChat.getId());
+                    message.setId(rs.getInt("id"));
+
+                    if (!checkIfBlocked(currentUser, otherUserId)) {
+                        message.setContent(rs.getString("content"));
+                    } else {
+                        message.setContent("<You blocked this user>");
+                    }
 
                     DirectMsgAttachment attachment = getAttachmentFromMessageId(rs.getInt("id"));
                     if (attachment == null) {
@@ -179,4 +201,64 @@ public class DirectChats {
         }
         return response;
     }
+
+    // TODO: add attachments
+    @POST
+    @Path("send")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> sendDirectMessage(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        User user = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "INSERT INTO direct_chat_messages (conversation_id, sender_user_id, content) VALUES (?, ?, ?);"
+            );
+        ) {
+            stmt.setInt(1, Integer.parseInt(JSON.get("conversationId")));
+            stmt.setInt(2, user.getId());
+            stmt.setString(3, JSON.get("content"));
+
+            int result = stmt.executeUpdate();
+            if (result == 1) {
+                response.put("message", "Message sent successfully");
+            } else {
+                response.put("message", "Could not send message");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Could not send message");
+        }
+        return response;
+    }
+
+    @POST
+    @Path("delete")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> deleteDirectMessage(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE direct_chat_messages SET is_deleted=1 WHERE conversation_id=?;"
+            );
+        ) {
+            stmt.setInt(1, Integer.parseInt(JSON.get("direct_chat_id")));
+            
+            int result = stmt.executeUpdate();
+            if (result == 1) {
+                response.put("message", "Message deleted successfully");
+            } else {
+                response.put("message", "Could not delete message");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.put("message", "Could not delete message");
+        }
+        return response;
+    }
+
 }

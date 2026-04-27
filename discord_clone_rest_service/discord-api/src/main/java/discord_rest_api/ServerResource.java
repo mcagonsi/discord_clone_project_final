@@ -14,105 +14,19 @@ import discord_rest_api.models.Permission;
 import discord_rest_api.models.Role;
 import discord_rest_api.models.Server;
 import discord_rest_api.models.User;
+import discord_rest_api.utils.CommonGetters;
 import discord_rest_api.utils.ConstantVariables;
 import discord_rest_api.utils.DatabaseConnection;
 import discord_rest_api.utils.InviteCodeGenerator;
 import discord_rest_api.utils.PermissionConst;
-import jakarta.websocket.SendHandler;
 import jakarta.ws.rs.*;
 
 @Path("/servers")
 public class ServerResource implements Serializable {
 
-    private User getUserFromUid(String user_uid) {
-        // Logic to retrieve the User object based on the provided user_uid
-        // figure out how we can abstract this to one central source or method
-        // This could involve querying the database or an in-memory data structure
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn
-                        .prepareStatement("SELECT id,token,username FROM users WHERE user_uid = ?")) {
-            stmt.setString(1, user_uid);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setToken(rs.getString("token"));
-                    user.setUsername(rs.getString("username"));
-
-                    return user;
-                } else {
-                    // Handle case where user is not found
-                    return null;
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
-    }
-
-    private User getUserByUsername(String username) {
-        // Logic to retrieve the User object based on the provided username
-        // figure out how we can abstract this to one central source or method
-        // This could involve querying the database or an in-memory data structure
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT id, user_uid, username, display_name FROM users WHERE username = ?")) {
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    // Set other user properties as needed
-                    return user;
-                } else {
-
-                    return null;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
-    }
-
-    private Server getServerById(int serverId) {
-        // Logic to retrieve the Server object based on the provided serverId
-        // This could involve querying the database or an in-memory data structure
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT id, name, description, owner_id, invite_code, isPublic FROM servers WHERE id = ?")) {
-            stmt.setInt(1, serverId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Server server = new Server();
-                    server.setId(rs.getInt("id"));
-                    server.setName(rs.getString("name"));
-                    server.setDescription(rs.getString("description"));
-                    server.setOwnerId(rs.getInt("owner_id"));
-                    server.setInviteCode(rs.getString("invite_code"));
-                    server.setPublic(rs.getBoolean("isPublic"));
-                    // Set other server properties as needed
-                    return server;
-                } else {
-                    // Handle case where server is not found
-                    return null;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Handle exceptions appropriately
-        }
-        return null; // Placeholder return statement
-    }
-
     private boolean sendInviteDirectMessage(User sender, User receiver, String serverId) {
         // robust serverId parse
-        Server server = getServerById(Integer.parseInt(serverId));
+        Server server = CommonGetters.getServerById(Integer.parseInt(serverId));
         int conversation_id = DirectChat.checkOrCreateConversationIdForUsers(sender, receiver);
          // send message if we have a conversation id
         if (conversation_id != -1) {
@@ -136,7 +50,7 @@ public class ServerResource implements Serializable {
         return false;
     }
 
-    private boolean checkInvitePermissions(User user, Server server) {
+    private boolean checkInvitePermissions(User user, Server server) { //TODO: replace with the new partsed out one
         boolean hasPermission = false;
         if (user != null && server != null) {
             // Example logic: check if the user is the owner of the server
@@ -219,7 +133,7 @@ public class ServerResource implements Serializable {
         HashMap<String, Object> response = new HashMap<>();
         String user_uid = (String) request.get("user_uid");
         String token = (String) request.get("token");
-        User owner = getUserFromUid(user_uid);
+        User owner = CommonGetters.getUserFromUserUID(user_uid);
         if (owner == null) {
             System.out.println("User not found for user_uid: " + user_uid);
             response.put("message", "User not found or bad credentials");
@@ -324,10 +238,10 @@ public class ServerResource implements Serializable {
         String invitedByUid = (String) invitedBy.get("uid");
         String invitedByToken = (String) invitedBy.get("token"); // use this to validate user
 
-        User invitedUser = getUserByUsername(invitedUsername);
-        User invitedByUser = getUserFromUid(invitedByUid);
+        User invitedUser = CommonGetters.getUserByUsername(invitedUsername);
+        User invitedByUser = CommonGetters.getUserFromUserUID(invitedByUid);
 
-        Server server = getServerById(Integer.parseInt(serverId));
+        Server server = CommonGetters.getServerById(Integer.parseInt(serverId));
 
         if (invitedByUser == null) {
             response.put("message", "Invalid user credentials.");
@@ -386,8 +300,8 @@ public class ServerResource implements Serializable {
         String inviteCode = (String) request.get("inviteCode");
         HashMap<String, Object> user = (HashMap<String, Object>) request.get("user");
 
-        Server server = getServerById(serverId);
-        User userObj = getUserFromUid((String) user.get("uid"));
+        Server server = CommonGetters.getServerById(serverId);
+        User userObj = CommonGetters.getUserFromUserUID((String) user.get("uid"));
 
         boolean userIsvalid = User.isValidUser(userObj, (String) user.get("token"));
         boolean userIsOnServer = false;
