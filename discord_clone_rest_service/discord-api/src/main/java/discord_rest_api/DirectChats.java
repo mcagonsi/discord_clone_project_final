@@ -185,7 +185,6 @@ public class DirectChats {
         return response;
     }
 
-    //TODO: Attachments need to be tested, not sure how I would do such
     @POST
     @Path("chatlog")
     @Produces("application/json")
