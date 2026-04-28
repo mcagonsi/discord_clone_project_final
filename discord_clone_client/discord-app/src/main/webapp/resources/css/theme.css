@@ -81,3 +81,19 @@ a.accent-link:hover {
     color: var(--accent-dark);
     text-decoration: underline;
 }
+
+/* Override Tailwind's base font-size (use @layer base so it runs after Preflight) */
+@layer base {
+    /* Set root font size for rem calculations (16px default). Use 62.5% for 10px base if desired. */
+    html {
+        font-size: 16px;
+    }
+
+    /* Optional: responsive adjustments */
+    @media (max-width: 640px) {
+        html { font-size: 15px; }
+    }
+    @media (min-width: 1280px) {
+        html { font-size: 18px; }
+    }
+}

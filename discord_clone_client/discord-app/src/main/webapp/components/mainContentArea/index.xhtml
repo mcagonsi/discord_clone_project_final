@@ -9,16 +9,24 @@
       id="chatPanel"
       layout="block"
       styleClass="flex-1 min-h-0 flex flex-col"
-      rendered="#{dashboardNavigation.mainContentPanel == 'chatPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'chatPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
       <ui:include src="chatPanel.xhtml" />
+    </h:panelGroup>
+    <h:panelGroup
+      id="serverChatPanel"
+      layout="block"
+      styleClass="flex-1 min-h-0 flex flex-col"
+      rendered="#{dashboardNavigation.mainContentPanel == 'serverChatPanel' and dashboardNavigation.sideBarPanel == 'server'}"
+    >
+      <ui:include src="serverChatPanel.xhtml" />
     </h:panelGroup>
 
     <h:panelGroup
       id="blockUserPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
-      rendered="#{dashboardNavigation.mainContentPanel == 'blockPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'blockPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
       <ui:include src="BlockPanel.xhtml" />
     </h:panelGroup>
@@ -27,7 +35,7 @@
       id="createServerViewPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
-      rendered="#{dashboardNavigation.mainContentPanel == 'createServerPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'createServerPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
       <ui:include src="createServerPanel.xhtml" />
     </h:panelGroup>
@@ -36,7 +44,7 @@
       id="JoinPrivateServerViewPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
-      rendered="#{dashboardNavigation.mainContentPanel == 'joinServerPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'joinServerPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
       <ui:include src="joinPrivateServer.xhtml" />
     </h:panelGroup>
@@ -45,7 +53,7 @@
       id="searchServerPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
-      rendered="#{dashboardNavigation.mainContentPanel == 'searchServersPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'searchServersPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
       <ui:include src="searchServersPanel.xhtml" />
     </h:panelGroup>
@@ -54,7 +62,7 @@
       id="friendsViewPanel"
       layout="block"
       styleClass="flex-1 min-h-0 overflow-auto"
-      rendered="#{dashboardNavigation.mainContentPanel == 'friendsPanel'}"
+      rendered="#{dashboardNavigation.mainContentPanel == 'friendsPanel' and dashboardNavigation.sideBarPanel == 'DMs'}"
     >
     
       <ui:include src="friendsPanel.xhtml" />

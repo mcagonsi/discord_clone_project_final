@@ -7,7 +7,7 @@
   <h:form id="serverRailForm">
     <h:panelGroup
       id="serverRail"
-      styleClass="w-full gap-3 px-2 h-full flex flex-col items-center"
+      styleClass="w-full gap-3 px-2 h-full flex flex-col text-xs items-center"
     >
       <h:commandButton
         action="#{dashboardNavigation.toggleSideBarPanel('DMs')}"
@@ -32,6 +32,7 @@
             styleClass="w-full h-10 bg-gray-700 hover:bg-blue-600 text-white rounded-md"
           >
             <f:ajax execute="@this" render=":sideNav" />
+         
           </h:commandButton>
         </ui:repeat>
       </h:panelGroup>

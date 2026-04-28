@@ -275,7 +275,7 @@ public class ServerBean implements Serializable {
                         .post(Entity.json(requestBody), HashMap.class);
 
                if (response.get("joinedServers") != null) {
-                //    joinedServersList.clear();
+                   joinedServersList.clear();
                    for (HashMap<String, Object> serverInfo : (List<HashMap<String, Object>>) response.get("joinedServers")) {
                        System.out.println("Joined Server Info: " + serverInfo);
                        Server server = new Server();
