@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import discord_rest_api.models.DirectChat;
+import discord_rest_api.DirectChats;
 import discord_rest_api.models.Permission;
 import discord_rest_api.models.Role;
 import discord_rest_api.models.Server;
@@ -27,7 +27,7 @@ public class ServerResource implements Serializable {
     private boolean sendInviteDirectMessage(User sender, User receiver, String serverId) {
         // robust serverId parse
         Server server = CommonGetters.getServerById(Integer.parseInt(serverId));
-        int conversation_id = DirectChat.checkOrCreateConversationIdForUsers(sender, receiver);
+        int conversation_id = DirectChats.checkOrCreateConversationIdForUsers(sender, receiver);
          // send message if we have a conversation id
         if (conversation_id != -1) {
             try (Connection conn = DatabaseConnection.getConnection();
