@@ -27,11 +27,4 @@ public class InviteCodeGenerator {
         USED_CODES.add(code);
         return code;
     }
-
-    // public static void main(String[] args) {
-    //     // Example: Generate 10 invitation codes
-    //     for (int i = 0; i < 10; i++) {
-    //         System.out.println(generateCode(8)); // 8-char code like Discord
-    //     }
-    // }
 }

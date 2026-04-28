@@ -23,6 +23,48 @@ import jakarta.ws.rs.Path;
 @Path("directchats")
 public class DirectChats {
 
+    public static int checkOrCreateConversationIdForUsers(User user1, User user2) {
+        int conversation_id = -1;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT id FROM direct_chats WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)")) {
+                stmt.setInt(1, user1.getId());
+                stmt.setInt(2, user2.getId());
+                stmt.setInt(3, user2.getId());
+                stmt.setInt(4, user1.getId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        conversation_id = rs.getInt("id");
+                    }
+                }
+            }
+
+            // create conversation if needed (return generated key)
+            if (conversation_id == -1) {
+                try (PreparedStatement createStmt = conn.prepareStatement(
+                        "INSERT INTO direct_chats (sender_id, receiver_id) VALUES (?, ?)",
+                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                    createStmt.setInt(1, user1.getId());
+                    createStmt.setInt(2, user2.getId());
+                    int rowsAffected = createStmt.executeUpdate();
+                    if (rowsAffected > 0) {
+                        try (ResultSet keys = createStmt.getGeneratedKeys()) {
+                            if (keys.next()) {
+                                conversation_id = keys.getInt(1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error occurred while fetching or creating conversation", e);
+        }
+        return conversation_id;
+    }
+
     private DirectChat getDirectChatFromId(int id) {
         try (
             Connection conn = DatabaseConnection.getConnection();
@@ -143,7 +185,6 @@ public class DirectChats {
         return response;
     }
 
-    //TODO: Attachments need to be tested, not sure how I would do such
     @POST
     @Path("chatlog")
     @Produces("application/json")
@@ -254,10 +295,10 @@ public class DirectChats {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
-                "UPDATE direct_chat_messages SET is_deleted=1 WHERE conversation_id=?;"
+                "UPDATE direct_chat_messages SET is_deleted=1 WHERE id=?;"
             );
         ) {
-            stmt.setInt(1, Integer.parseInt(JSON.get("direct_chat_id")));
+            stmt.setInt(1, Integer.parseInt(JSON.get("direct_chat_message_id")));
             
             int result = stmt.executeUpdate();
             if (result == 1) {
@@ -272,4 +313,18 @@ public class DirectChats {
         return response;
     }
 
+    @POST
+    @Path("openorcreatedirectchat")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> openOrCreateDirectChat(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        User currentUser = CommonGetters.getUserFromUserUID("user_uid");
+        User otherUser = CommonGetters.getUserByUsername("other_user_username");
+
+        int directChatId = checkOrCreateConversationIdForUsers(currentUser, otherUser);
+
+        response.put("directChatId", directChatId);
+        return response;
+    }
 }

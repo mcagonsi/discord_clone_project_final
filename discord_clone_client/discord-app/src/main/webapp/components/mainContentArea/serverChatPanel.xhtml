@@ -8,44 +8,42 @@
 >
   <f:event
     type="preRenderComponent"
-    listener="#{directChatBean.loadDirectChatMessages}"
+    listener="#{serverChatBean.loadChannelMessages}"
   />
+
   <h:panelGroup
-    id="chatPanelView"
+    id="serverChatPanelView"
     layout="block"
     styleClass="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
   >
-    <ui:repeat value="#{directChatBean.directChatMessages}" var="message">
-      <div class="flex items-start text-xs gap-3">
+    <ui:repeat value="#{serverChatBean.serverChannelMessages}" var="message">
+      <div class="flex items-start gap-3">
         <div>
           <div class="flex items-center gap-2">
             <span class="font-semibold text-gray-300">
-              @#{message.authorId == directChatBean.getSessionedUser().getId() ?
-              directChatBean.getSessionedUser().getUsername() :
-              directChatBean.chattingWith.username}
+              @#{message.senderId}
             </span>
             <span class="text-xs text-gray-500">#{message.createdAt}</span>
           </div>
           <p class="text-sm text-gray-200 mt-1">#{message.content}</p>
         </div>
-         <h:commandButton
+        <h:commandButton
           value="🗑"
-          action="#{directChatBean.deleteMessage(message.id)}"
+          action="#"
           title="Delete message"
-          rendered="#{directChatBean.sessionedUser.id == message.authorId}"
+          rendered="#{serverChatBean.sessionedUser.id == message.senderId}"
           styleClass="w-7 h-7 p-0 flex items-center justify-center bg-transparent hover:bg-red-600 text-red-400 hover:text-white rounded-md"
         >
-          <f:ajax execute="@this" render="chatPanelView" />
+          <f:ajax execute="@this" render="serverChatPanelView" />
         </h:commandButton>
       </div>
     </ui:repeat>
   </h:panelGroup>
 
-  <!-- Chat input stays at the bottom of this column -->
   <div
-    id="chatInputContainer"
+    id="schatInputContainer"
     class="shrink-0 w-full border-t border-gray-800 bg-black"
   >
-    <ui:include src="/components/ui/chatInput.xhtml" />
+    <ui:include src="/components/ui/serverChatInput.xhtml" />
   </div>
 </ui:composition>

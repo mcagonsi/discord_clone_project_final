@@ -6,6 +6,7 @@ public class MsgAttachment implements Serializable {
 
     private int id;
     private String path;
+    private String filename;
 
     public int getId() {
         return id;
@@ -21,6 +22,14 @@ public class MsgAttachment implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
 }
