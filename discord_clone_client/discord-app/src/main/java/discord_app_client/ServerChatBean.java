@@ -7,8 +7,10 @@ import java.util.List;
 
 import discord_app_client.models.Channel;
 import discord_app_client.models.DirectChatMessage;
+import discord_app_client.models.Server;
 import discord_app_client.models.ServerChat;
 import discord_app_client.models.ServerChatMessage;
+import discord_app_client.models.ServerMember;
 import discord_app_client.models.User;
 import discord_app_client.utils.Variables;
 import jakarta.annotation.PostConstruct;
@@ -34,6 +36,8 @@ public class ServerChatBean implements Serializable {
     @Inject
     private DashboardNavigationState dashboardNavigationState;
 
+    //TODO: make this work
+    private List<ServerMember> serverMembers = new ArrayList<>();
 
     private Client client;
     private WebTarget base;
@@ -117,6 +121,36 @@ public class ServerChatBean implements Serializable {
        
     }
 
+        public String loadServerMembers() {
+        try {
+                WebTarget serverMembersListTarget = base.path("servermembers/list");
+
+                HashMap<String, Object> requestBody = new HashMap<>();
+                requestBody.put("server_id", "" + dashboardNavigationState.getServerId());
+                System.out.println("Request Body: " + requestBody);
+
+                HashMap<String, Object> response = serverMembersListTarget
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(Entity.json(requestBody), HashMap.class);
+
+               if (response.get("servermembers") != null) {
+                   serverMembers.clear();
+                   System.out.println(response.get("servermembers"));
+                   //serverChat.setChannels((List<Channel>) response.get("channels"));
+                   serverMembers = (List<ServerMember>) response.get("servermembers");
+                   System.out.println(serverMembers);
+                }
+                else {
+                    message = (String) response.get("message");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Error occurred while creating server";
+            }
+            return null;
+    }
+
     public ServerChat getServerChat() {
         return serverChat;
     }
@@ -162,6 +196,13 @@ public class ServerChatBean implements Serializable {
     }
     public void setSessionedUser(SessionedUser sessionedUser) {
         this.sessionedUser = sessionedUser;
+    }
+
+    public List<ServerMember> getServerMembers() {
+        return serverMembers;
+    }
+    public void setServerMembers(List<ServerMember> serverMembers) {
+        this.serverMembers = serverMembers;
     }
 }
 

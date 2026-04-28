@@ -6,16 +6,29 @@
   xmlns:f="http://xmlns.jcp.org/jsf/core"
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
-  <div id="membersPanel">
+  <h:panelGroup id="membersPanel">
     <span class="text-xs text-gray-400 uppercase">Server Members</span>
         <div>
             <span>
-                <ui:repeat value="#{}" var="member">
-                  <span>
-                    #{member.user.name}
-                  </span>
+              <f:event
+                type="preRenderComponent"
+                listener="#{serverChatBean.loadServerMembers}"
+              />
+              <h:panelGroup>
+                <ui:repeat value="#{serverChatBean.serverMembers}" var="member">
+                  <div class="flex items-center justify-between rounded-lg bg-gray-900 border border-gray-800 px-4 py-3 hover:bg-gray-800">
+                    <p class="truncate text-sm font-medium text-gray-100">
+                      #{member.user.display_name}
+                    </p>
+                    <ui:repeat value="#{member.role}" var="r">
+                      <p class="truncate text-sm font-medium text-gray-100">
+                        #{r.name}
+                      </p>
+                    </ui:repeat>
+                  </div>
                 </ui:repeat>
+              </h:panelGroup>
             </span>
         </div>
-  </div>
+  </h:panelGroup>
 </ui:composition>
