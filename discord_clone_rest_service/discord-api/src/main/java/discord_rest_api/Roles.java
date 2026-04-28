@@ -170,4 +170,53 @@ public class Roles {
         }
         return response;
     }
+
+    @POST
+    @Path("assign")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public HashMap<String, Object> assignRole(HashMap<String, String> JSON) {
+        HashMap<String, Object> response = new HashMap<>();
+        User currentUser = CommonGetters.getUserFromUserUID(JSON.get("current_user_uid"));
+        User userToAssignRole = CommonGetters.getUserFromUserUID(JSON.get("user_to_assign_role_uid"));
+        Role role = getRoleById(Integer.parseInt(JSON.get("role_id")));
+        Server server = CommonGetters.getServerById(Integer.parseInt(JSON.get("server_id")));        
+
+        if (currentUser == null || userToAssignRole == null) {
+            response.put("message", "Invalid user credentials");
+        } else if (server == null) {
+            response.put("message", "Could not find server");
+        } else if (role == null) {
+            response.put("message", "Invalid role id");
+        } else {
+            if (CheckPermission.checkPermissionByName(currentUser, server, PermissionConst.MANAGE_ROLES) && server != null) {
+                try (
+                    Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(
+                        "INSERT INTO server_member_roles (server_member_id, role_id) VALUES (?, ?);"
+                    )
+                ) {
+                    stmt.setInt(1, userToAssignRole.getId());
+                    stmt.setInt(2, role.getId());
+
+                    int result = stmt.executeUpdate();
+                    if (result == 1) {
+                        response.put("message", "User '"+userToAssignRole.getDisplay_name()+"' now has the role: "+role.getName());
+                    } else {
+                        response.put("message", "Unable to assign role");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    response.put("message", "Unable to assign role");
+                }
+            } else {
+                if (server != null) {
+                    response.put("message", currentUser.getDisplay_name() + " does not have permission to manage roles in " + server.getName());
+                } else {
+                    response.put("message", "Could not find server");
+                }
+            }
+        }
+        return response;
+    }
 }
