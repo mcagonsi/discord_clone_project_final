@@ -92,7 +92,7 @@ public class ServerChat {
                 "UPDATE server_messages SET is_deleted=1 WHERE id=?;"
             );
         ) {
-            stmt.setInt(2, Integer.parseInt(JSON.get("server_message_id")));
+            stmt.setInt(1, Integer.parseInt(JSON.get("server_message_id")));
             
             int result = stmt.executeUpdate();
             if (result == 1) {
