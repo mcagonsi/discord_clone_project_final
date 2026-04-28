@@ -38,4 +38,3 @@ public class App implements Serializable{
     System.out.println(permissions);
    }
 }
-    
