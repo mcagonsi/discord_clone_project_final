@@ -31,6 +31,14 @@
     >
       <ui:include src="BlockPanel.xhtml" />
     </h:panelGroup>
+    <h:panelGroup
+      id="aboutServerPanel"
+      layout="block"
+      styleClass="flex-1 min-h-0 overflow-auto"
+      rendered="#{dashboardNavigation.mainContentPanel == 'aboutServerPanel' and dashboardNavigation.sideBarPanel == 'server'}"
+    >
+      <ui:include src="aboutServerPanel.xhtml" />
+    </h:panelGroup>
 
     <h:panelGroup
       id="createServerViewPanel"
