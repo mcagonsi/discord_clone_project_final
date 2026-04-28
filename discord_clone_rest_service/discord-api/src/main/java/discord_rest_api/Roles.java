@@ -21,7 +21,7 @@ import jakarta.ws.rs.Produces;
 @Path("roles")
 public class Roles {
 
-    private static Role getRoleById(int id) {
+    public static Role getRoleById(int id) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
