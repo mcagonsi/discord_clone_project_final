@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import discord_rest_api.models.Channel;
+import discord_rest_api.models.ServerMsgAttachment;
 import discord_rest_api.models.MsgAttachment;
 import discord_rest_api.models.ServerMessage;
 import discord_rest_api.models.User;
@@ -22,7 +22,7 @@ import jakarta.ws.rs.Path;
 @Path("serverchats")
 public class ServerChat {
 
-    private MsgAttachment getAttachmentFromMessageId(int id) {
+    private ServerMsgAttachment getAttachmentFromMessageId(int id) {
         try (
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(
@@ -34,8 +34,7 @@ public class ServerChat {
                 ResultSet rs = stmt.executeQuery();
             ) {
                 if (rs.next()) {
-                    MsgAttachment attachment = new MsgAttachment();
-                    //TODO: change
+                    ServerMsgAttachment attachment = new ServerMsgAttachment();
                     attachment.setId(rs.getInt("id"));
                     attachment.setPath(rs.getString("file_path"));
                     return attachment;

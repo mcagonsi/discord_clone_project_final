@@ -1,11 +1,5 @@
 package discord_rest_api.models;
 
-import java.sql.PreparedStatement;
-import java.sql.*;
-
-
-import discord_rest_api.utils.DatabaseConnection;
-
 public class DirectChat extends Chat {
 
     private int id;
