@@ -55,12 +55,15 @@ public class CheckPermission {
                                 try (PreparedStatement smrStmt = conn.prepareStatement(
                                         "SELECT p.id, p.name FROM permissions p JOIN role_permissions rp ON p.id = rp.permission_id WHERE rp.role_id = ?")) {
                                     smrStmt.setInt(1, role.getId());
-                                    ResultSet permRs = smrStmt.executeQuery();
-                                    while (permRs.next()) {
-                                        Permission permission = new Permission();
-                                        permission.setId(permRs.getInt("id"));
-                                        permission.setName(permRs.getString("name"));
-                                        role.permissions.add(permission);
+                                    try (
+                                        ResultSet permRs = smrStmt.executeQuery();
+                                    ) {
+                                        while (permRs.next()) {
+                                            Permission permission = new Permission();
+                                            permission.setId(permRs.getInt("id"));
+                                            permission.setName(permRs.getString("name"));
+                                            role.permissions.add(permission);
+                                        }
                                     }
                                 } catch (SQLException e) {
                                     e.printStackTrace();
