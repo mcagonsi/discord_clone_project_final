@@ -10,8 +10,10 @@
     <span class="text-xs text-gray-400 uppercase">Server Members</span>
         <div>
             <span>
-                <ui:repeat value="" var="">
-                    
+                <ui:repeat value="#{}" var="member">
+                  <span>
+                    #{member.user.name}
+                  </span>
                 </ui:repeat>
             </span>
         </div>
