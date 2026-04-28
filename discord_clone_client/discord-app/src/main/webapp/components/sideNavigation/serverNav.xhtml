@@ -66,10 +66,10 @@
           />
           <ui:repeat value="#{serverChatBean.serverChat.channels}" var="channel">
             <h:commandButton
-              action="#{dashboardNavigation.toggleMainContentPanel('serverChatPanel')}"
+              action="#{dashboardNavigation.toggleChannel(channel.id)}"
               value="##{channel.name}"
               styleClass="w-full h-fit hover:text-blue-800 border-b text-xs border-gray-500 text-white"
-              onclick="console.log('channel changed')"
+              
             >
               <f:ajax execute="@this" render="@all" />
             </h:commandButton>

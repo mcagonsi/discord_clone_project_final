@@ -23,6 +23,7 @@ public class DashboardNavigationState implements Serializable {
     private String mainContentPanel = "friendsPanel";
     private String mainContentTitle;
     private int directChatId;
+    private int channelId;
 
     public void toggleShowProfile() {
         this.showProfile = !this.showProfile;
@@ -53,8 +54,14 @@ public class DashboardNavigationState implements Serializable {
     public void toggleSelectedServer(int serverId) {
         this.serverId = serverId;
         this.sideBarPanel = "server";
-        this.mainContentPanel = "serverChatPanel";
+        this.mainContentPanel = "aboutServerPanel";
         System.out.println("Toggled Server with ID: " + serverId);
+    }
+
+    public void toggleChannel(int channelId) {
+        this.channelId = channelId;
+        this.mainContentPanel = "serverChatPanel";
+        System.out.println("Toggled Channel with ID: " + channelId);
     }
 
     public boolean isShowProfile() {
@@ -104,5 +111,13 @@ public class DashboardNavigationState implements Serializable {
 
     public void setServerId(int serverId) {
         this.serverId = serverId;
+    }
+
+    public int getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(int channelId) {
+        this.channelId = channelId;
     }
 }
