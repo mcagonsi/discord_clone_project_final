@@ -191,16 +191,16 @@ public class DirectChatBean implements Serializable {
     }
 
     public String sendDirectChatMessage() {
-        if(messageContent == null && attachmentFile == null) {
+        if (messageContent == null && attachmentFile == null) {
             message = "Message content or attachment is required";
             return null;
         }
-       
+
         try {
             WebTarget sendMessageTarget = base.path("directchats/send");
 
             HashMap<String, Object> requestBody = new HashMap<>();
-            if(attachmentFile != null) {
+            if (attachmentFile != null) {
                 InputStream fileInputStream = attachmentFile.getInputStream();
                 String filepath = sessionedUser.getUserUid() + "/media/" + attachmentFile.getSubmittedFileName();
                 Files.createDirectories(Paths.get(filepath).getParent());
@@ -218,7 +218,7 @@ public class DirectChatBean implements Serializable {
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.json(requestBody), HashMap.class);
 
-            if (response.get("success") != null ) {
+            if (response.get("success") != null) {
                 messageContent = ""; // Clear input after successful send
                 loadDirectChatMessages(); // Refresh chat log
             } else {
@@ -230,6 +230,33 @@ public class DirectChatBean implements Serializable {
             message = "Error occurred while sending message";
         }
         return null;
+    }
+    
+    public void deleteMessage(int messageId) {
+        System.out.println("Deleting message with ID: " + messageId);
+        try {
+            WebTarget deleteMessageTarget = base.path("directchats/delete");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("message_id", String.valueOf(messageId));
+            
+
+            HashMap<String, Object> response = deleteMessageTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
+
+            if (response.get("message") != null) {
+                messageContent = ""; // Clear input after successful send
+                loadDirectChatMessages(); // Refresh chat log
+            } else {
+                message = (String) response.get("message");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while sending message";
+        }
+
     }
 
     public void setMessage(String message) {
