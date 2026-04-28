@@ -15,13 +15,30 @@
   </h:head>
 
   <h:body class="h-full flex flex-col bg-black m-0">
-    
-    <header class="w-full h-14 border-b border-red-800 mb-2 bg-transparent z-20 shrink-0">
-      <ui:include src="../components/me/titleBar.xhtml" />
-    </header>
+    <h:panelGroup rendered="#{sessionedUser.username == null}">
+      <div class="h-screen w-full flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-gray-900/60 border border-gray-800 rounded-xl shadow-lg p-8 text-center">
+          <h2 class="text-2xl font-semibold text-white mb-4">Ooopsie! You are not Logged In</h2>
+          <p class="text-gray-300 mb-6">Please log in to continue to your dashboard.</p>
+          <a
+            href="#{request.contextPath}/index.xhtml"
+            class="inline-flex items-center justify-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Log in
+          </a>
+        </div>
+      </div>
+    </h:panelGroup>
+    <h:panelGroup rendered="#{sessionedUser.username != null}">
+      <header
+        class="w-full h-14 border-b border-red-800 mb-2 bg-transparent z-20 shrink-0"
+      >
+        <ui:include src="../components/me/titleBar.xhtml" />
+      </header>
 
-    <main class=" flex-1 min-h-0 overflow-hidden flex">
-      <ui:include src="../components/me/DashboardLayout.xhtml" />
-    </main>
+      <main class="flex-1 min-h-0 overflow-hidden flex">
+        <ui:include src="../components/me/DashboardLayout.xhtml" />
+      </main>
+    </h:panelGroup>
   </h:body>
 </html>

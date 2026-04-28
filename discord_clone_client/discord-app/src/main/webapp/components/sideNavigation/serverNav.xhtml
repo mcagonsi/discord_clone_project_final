@@ -6,6 +6,76 @@
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
   <div>
-    <p>Channel Navigation</p>
+    <div class="flex flex-col gap-2 mb-2">
+      <span class="text-xs text-gray-400 uppercase">Server Options</span>
+      <h:form>
+        <div class="flex flex-col gap-2">
+          <h:commandButton
+            action="#"
+            value="Create Channel"
+            styleClass="w-full h-8 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-xs px-2"
+          >
+            <f:ajax execute="@this" render=":mainContentPanel" />
+          </h:commandButton>
+
+          <h:commandButton
+            action="#"
+            value="Create Role"
+            styleClass="w-full h-8 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-xs px-2"
+          >
+            <f:ajax execute="@this" render=":mainContentPanel" />
+          </h:commandButton>
+
+          <h:commandButton
+            action="#"
+            value="Send Server Invite"
+            styleClass="w-full h-8 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-xs px-2"
+          >
+            <f:ajax execute="@this" render=":mainContentPanel" />
+          </h:commandButton>
+
+          <h:commandButton
+            action="#"
+            value="Kick User from Server"
+            styleClass="w-full h-8 bg-gray-700 hover:bg-red-600 text-white rounded-md text-xs px-2"
+          >
+            <f:ajax execute="@this" render=":mainContentPanel" />
+          </h:commandButton>
+
+          <h:commandButton
+            action="#"
+            value="Manage Channel Permissions"
+            styleClass="w-full h-8 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-xs px-2"
+          >
+            <f:ajax execute="@this" render=":mainContentPanel" />
+          </h:commandButton>
+        </div>
+      </h:form>
+    </div>
+    <hr class="border-gray-600 my-2" />
+    <h:form>
+      <div class="flex flex-col gap-3">
+        <h:panelGroup layout="block">
+          <f:event
+            type="preRenderComponent"
+            listener="#{serverChatBean.loadChannelList}"
+          />
+          <h:outputText
+            value="Channels List"
+            styleClass="text-xs text-gray-400 uppercase"
+          />
+          <ui:repeat value="#{serverChatBean.serverChat.channels}" var="channel">
+            <h:commandButton
+              action="#{dashboardNavigation.toggleMainContentPanel('serverChatPanel')}"
+              value="##{channel.name}"
+              styleClass="w-full h-fit hover:text-blue-800 border-b text-xs border-gray-500 text-white"
+              onclick="console.log('channel changed')"
+            >
+              <f:ajax execute="@this" render="@all" />
+            </h:commandButton>
+          </ui:repeat>
+        </h:panelGroup>
+      </div>
+    </h:form>
   </div>
 </ui:composition>
