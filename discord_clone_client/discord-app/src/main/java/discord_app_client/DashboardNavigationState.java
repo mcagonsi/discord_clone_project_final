@@ -53,6 +53,7 @@ public class DashboardNavigationState implements Serializable {
     public void toggleSelectedServer(int serverId) {
         this.serverId = serverId;
         this.sideBarPanel = "server";
+        this.mainContentPanel = "serverChatPanel";
         System.out.println("Toggled Server with ID: " + serverId);
     }
 

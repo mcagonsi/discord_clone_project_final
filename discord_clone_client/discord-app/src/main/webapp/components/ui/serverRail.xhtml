@@ -31,7 +31,7 @@
             action="#{dashboardNavigation.toggleSelectedServer(server.id)}"
             styleClass="w-full h-10 bg-gray-700 hover:bg-blue-600 text-white rounded-md"
           >
-            <f:ajax execute="@this" render=":sideNav" />
+            <f:ajax execute="@this" render=":sideNav :mainContentPanel" />
          
           </h:commandButton>
         </ui:repeat>

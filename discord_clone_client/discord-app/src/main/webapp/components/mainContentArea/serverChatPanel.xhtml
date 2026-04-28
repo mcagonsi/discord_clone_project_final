@@ -10,14 +10,8 @@
     type="preRenderComponent"
     listener="#{serverChatBean.loadChannelMessages}"
   />
+
   <h:panelGroup
-    id="serverChannelChatPanelView"
-    layout="block"
-    styleClass="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
-  >
-  <h1 class="text-white">Server Chat Panel</h1>
-  </h:panelGroup>
-  <!-- <h:panelGroup
     id="serverChatPanelView"
     layout="block"
     styleClass="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
@@ -44,13 +38,12 @@
         </h:commandButton>
       </div>
     </ui:repeat>
-  </h:panelGroup> -->
+  </h:panelGroup>
 
-
-  <!-- <div
+  <div
     id="schatInputContainer"
     class="shrink-0 w-full border-t border-gray-800 bg-black"
   >
     <ui:include src="/components/ui/serverChatInput.xhtml" />
-  </div> -->
+  </div>
 </ui:composition>

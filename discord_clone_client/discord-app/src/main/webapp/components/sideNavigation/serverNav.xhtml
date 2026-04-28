@@ -71,7 +71,7 @@
               styleClass="w-full h-fit hover:text-blue-800 border-b text-xs border-gray-500 text-white"
               onclick="console.log('channel changed')"
             >
-              <f:ajax execute="@this" render=":mainContentPanel" />
+              <f:ajax execute="@this" render="@all" />
             </h:commandButton>
           </ui:repeat>
         </h:panelGroup>

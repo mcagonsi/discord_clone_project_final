@@ -149,11 +149,11 @@ public class ServerChatBean implements Serializable {
         this.attachmentFile = attachmentFile;
     }
 
-    public List<ServerChatMessage> getServerChatMessages() {
+    public List<ServerChatMessage> getServerChannelMessages() {
         return serverChannelMessages;
     }
 
-    public void setServerChatMessages(List<ServerChatMessage> serverChannelMessages) {
+    public void setServerChannelMessages(List<ServerChatMessage> serverChannelMessages) {
         this.serverChannelMessages = serverChannelMessages;
     }
     
