@@ -319,8 +319,9 @@ public class DirectChats {
     @Consumes("application/json")
     public HashMap<String, Object> openOrCreateDirectChat(HashMap<String, String> JSON) {
         HashMap<String, Object> response = new HashMap<>();
-        User currentUser = CommonGetters.getUserFromUserUID("user_uid");
-        User otherUser = CommonGetters.getUserByUsername("other_user_username");
+        
+        User currentUser = CommonGetters.getUserFromUserUID(JSON.get("user_uid"));
+        User otherUser = CommonGetters.getUserByUsername(JSON.get("other_user_username"));
 
         int directChatId = checkOrCreateConversationIdForUsers(currentUser, otherUser);
 

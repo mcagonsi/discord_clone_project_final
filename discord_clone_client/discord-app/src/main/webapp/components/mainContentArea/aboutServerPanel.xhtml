@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ui:composition
   lang="en"
   xmlns="http://www.w3.org/1999/xhtml"
@@ -6,5 +5,50 @@
   xmlns:f="http://xmlns.jcp.org/jsf/core"
   xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
- <h1 class="text-white">About Server</h1>
+  <h:panelGroup
+    id="createChannelPanel"
+    layout="block"
+    styleClass="h-full min-h-0 flex flex-col bg-gray-950 text-gray-100"
+  >
+    <!-- Header -->
+    <div class="shrink-0 border-b border-gray-800 px-5 py-4">
+      <h2 class="text-lg font-semibold">About Server</h2>
+      <p class="text-sm text-gray-400">
+        Learn more about this server. And Create Channels
+      </p>
+    </div>
+
+    <div class="shrink-0 px-5 py-5 border-b border-gray-800">
+      <h:form styleClass="max-w-xl flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-gray-300">Channel Name</label>
+          <h:inputText
+            value="#{serverChatBean.channelName}"
+            styleClass="w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-gray-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            placeholder="Enter channel name"
+          />
+        </div>
+
+      
+
+        <h:commandButton
+          value="Create Channel"
+          action="#{serverChatBean.createChannel}"
+          styleClass="w-fit rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+        >
+          <f:ajax execute="@form" render="createChannelMessagePanel :sideNav" />
+        </h:commandButton>
+
+        <h:panelGroup id="createChannelMessagePanel" layout="block">
+          <h:outputText
+            value="#{serverChatBean.message}"
+            rendered="#{not empty serverChatBean.message}"
+            styleClass="text-sm text-red-400"
+          />
+        </h:panelGroup>
+      </h:form>
+    </div>
+
+    <!-- Message -->
+  </h:panelGroup>
 </ui:composition>
