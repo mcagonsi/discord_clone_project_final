@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import discord_rest_api.models.Role;
+import discord_rest_api.models.Server;
 import discord_rest_api.models.ServerMember;
 import discord_rest_api.models.User;
 import discord_rest_api.utils.CommonGetters;
@@ -21,7 +22,7 @@ import jakarta.ws.rs.Produces;
 @Path("servermembers")
 public class GetServerMembers {
 
-    public static List<Role> getRolesForUser(User user) {
+    private static List<Role> getRolesForUser(User user, Server server) {
         List<Role> roles = new ArrayList<Role>();
         try (
             Connection conn = DatabaseConnection.getConnection();
@@ -37,7 +38,7 @@ public class GetServerMembers {
                     Role role = Roles.getRoleById(rs.getInt("role_id"));
                     roles.add(role);
                 }
-                if (roles.isEmpty()) {
+                if (user.getId() == server.getOwnerId()) {
                     Role ownerRole = new Role();
                     ownerRole.setName("Owner");
                     roles.add(ownerRole);
@@ -70,7 +71,8 @@ public class GetServerMembers {
                 while (rs.next()) {
                     ServerMember member = new ServerMember();
                     User user = CommonGetters.getUserFromId(rs.getInt("user_id"));
-                    List<Role> roles = getRolesForUser(user);
+                    Server server = CommonGetters.getServerById(Integer.parseInt(JSON.get("server_id")));
+                    List<Role> roles = getRolesForUser(user, server);
                     member.setUser(user);
                     member.setRole(roles);
                     System.out.println(roles);
