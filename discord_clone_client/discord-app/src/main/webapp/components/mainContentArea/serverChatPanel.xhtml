@@ -14,28 +14,30 @@
   <h:panelGroup
     id="serverChatPanelView"
     layout="block"
-    styleClass="flex-1 min-h-0 w-full overflow-y-auto px-4 py-4 space-y-4"
+    styleClass="flex-1 min-h-0 w-full text-xs overflow-y-auto px-4 py-4 space-y-4"
   >
     <ui:repeat value="#{serverChatBean.serverChannelMessages}" var="message">
       <div class="flex items-start gap-3">
         <div>
           <div class="flex items-center gap-2">
             <span class="font-semibold text-gray-300">
-              @#{message.senderId}
+              @#{serverChatBean.getUserFromId(message.authorId).username}
             </span>
             <span class="text-xs text-gray-500">#{message.createdAt}</span>
           </div>
           <p class="text-sm text-gray-200 mt-1">#{message.content}</p>
         </div>
-        <h:commandButton
-          value="🗑"
-          action="#"
-          title="Delete message"
-          rendered="#{serverChatBean.sessionedUser.id == message.senderId}"
-          styleClass="w-7 h-7 p-0 flex items-center justify-center bg-transparent hover:bg-red-600 text-red-400 hover:text-white rounded-md"
-        >
-          <f:ajax execute="@this" render="serverChatPanelView" />
-        </h:commandButton>
+        <h:form>
+          <h:commandButton
+            value="🗑"
+            action="#{serverChatBean.deleteMessage(message.id)}"
+            title="Delete message"
+            rendered="#{serverChatBean.sessionedUser.id == message.authorId}"
+            styleClass="w-7 h-7 p-0 flex items-center justify-center bg-transparent hover:bg-red-600 text-red-400 hover:text-white rounded-md"
+          >
+            <f:ajax execute="@this" render="serverChatPanelView" />
+          </h:commandButton>
+        </h:form>
       </div>
     </ui:repeat>
   </h:panelGroup>

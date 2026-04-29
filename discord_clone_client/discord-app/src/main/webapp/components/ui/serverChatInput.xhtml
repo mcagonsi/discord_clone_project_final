@@ -29,15 +29,15 @@
           style="height: fit-content"
           value="#{serverChatBean.messageContent}"
           styleClass="flex-1 bg-black/70 border border-gray-700 rounded-lg text-white placeholder-gray-500 px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition"
-        />
-      </div>
-      <h:commandButton
+        /><h:commandButton
         value="Send"
-        action="#"
-        styleClass="w-full h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg mt-2"
+        action="#{serverChatBean.sendServerChatMessage}"
+        styleClass="w-[150px] h-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg mt-2"
       >
         <f:ajax execute="@form" render=":serverChatPanelView @form " />
       </h:commandButton>
+      </div>
+      
     </h:form>
   </div>
 </ui:composition>

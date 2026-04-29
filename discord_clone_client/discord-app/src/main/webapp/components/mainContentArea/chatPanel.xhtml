@@ -28,15 +28,18 @@
           </div>
           <p class="text-sm text-gray-200 mt-1">#{message.content}</p>
         </div>
+        <h:form>
          <h:commandButton
           value="🗑"
           action="#{directChatBean.deleteMessage(message.id)}"
           title="Delete message"
+          onclick="console.log('delete button clicked')"
           rendered="#{directChatBean.sessionedUser.id == message.authorId}"
           styleClass="w-7 h-7 p-0 flex items-center justify-center bg-transparent hover:bg-red-600 text-red-400 hover:text-white rounded-md"
         >
-          <f:ajax execute="@this" render="chatPanelView" />
+          <f:ajax execute="@this" render=":chatPanelView" />
         </h:commandButton>
+        </h:form> 
       </div>
     </ui:repeat>
   </h:panelGroup>

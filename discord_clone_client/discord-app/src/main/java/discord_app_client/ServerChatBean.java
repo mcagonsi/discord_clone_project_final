@@ -1,14 +1,20 @@
 package discord_app_client;
 
+import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import discord_app_client.models.Channel;
 import discord_app_client.models.DirectChatMessage;
+import discord_app_client.models.Server;
 import discord_app_client.models.ServerChat;
 import discord_app_client.models.ServerChatMessage;
+import discord_app_client.models.ServerMember;
 import discord_app_client.models.User;
 import discord_app_client.utils.Variables;
 import jakarta.annotation.PostConstruct;
@@ -34,6 +40,8 @@ public class ServerChatBean implements Serializable {
     @Inject
     private DashboardNavigationState dashboardNavigationState;
 
+    //TODO: make this work
+    private List<ServerMember> serverMembers = new ArrayList<>();
 
     private Client client;
     private WebTarget base;
@@ -61,6 +69,35 @@ public class ServerChatBean implements Serializable {
         }
     }
 
+    public User getUserFromId(int id) {
+        try {
+            WebTarget userInfoTarget = base.path("auth/userinfo");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("id", String.valueOf(id));
+
+            HashMap<String, Object> response = userInfoTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
+
+            if (response.get("user") != null) {
+                HashMap<String, Object> userMap = (HashMap<String, Object>) response.get("user");
+                User user = new User();
+                user.setId(((Number) userMap.get("id")).intValue());
+                user.setUsername((String) userMap.get("username"));
+                user.setEmail((String) userMap.get("email"));
+                System.out.println("getting user from id: " + user);
+                return user;
+            } else {
+                message = (String) response.get("message");
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while fetching user info";
+            return null;
+        }
+    }
 
     public String loadChannelList() {
 
@@ -93,28 +130,129 @@ public class ServerChatBean implements Serializable {
     public void loadChannelMessages() {
         System.out.println("loading channel messages");
         System.out.println("the server channel page is getting loaded");
-        // try {
-        //     WebTarget channelMessagesTarget = base.path("channel/messages");
+        try {
+            WebTarget channelMessagesTarget = base.path("serverchats/chatlog");
 
-        //     HashMap<String, Object> requestBody = new HashMap<>();
-        //     requestBody.put("channel_id", String.valueOf(dashboardNavigationState.getChannelId()));
-        //     requestBody.put("user_uid", sessionedUser.getUserUid());
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("channel_id", String.valueOf(dashboardNavigationState.getChannelId()));
+            requestBody.put("user_uid", sessionedUser.getUserUid());
 
-        //     HashMap<String, Object> response = channelMessagesTarget
-        //             .request(MediaType.APPLICATION_JSON)
-        //             .post(Entity.json(requestBody), HashMap.class);
+            HashMap<String, Object> response = channelMessagesTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
 
-        //     if (response.get("messages") != null) {
-        //         serverChannelMessages.clear();
-        //         System.out.println(response.get("messages"));
-        //         serverChannelMessages.addAll((List<ServerChatMessage>) response.get("messages"));
-        //     }
-        //     return null;
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     message = "Error occurred while loading channel messages";
-        // }
-       
+            if (response.get("chatlog") != null) {
+                serverChannelMessages.clear();
+                System.out.println(response.get("chatlog"));
+                serverChannelMessages.addAll((List<ServerChatMessage>) response.get("chatlog"));
+                System.out.println("this is the cast server messages: " + serverChannelMessages);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while loading channel messages";
+        }
+
+    }
+    
+    public String sendServerChatMessage() {
+        if (messageContent == null && attachmentFile == null) {
+            message = "Message content or attachment is required";
+            return null;
+        }
+
+        try {
+            WebTarget sendMessageTarget = base.path("serverchats/send");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            if (attachmentFile != null) {
+                InputStream fileInputStream = attachmentFile.getInputStream();
+                String filepath = sessionedUser.getUserUid() + "/" + dashboardNavigationState.getChannelId()
+                        + "/server/media/" + attachmentFile.getSubmittedFileName();
+                Files.createDirectories(Paths.get(filepath).getParent());
+                Files.copy(fileInputStream, Paths.get(filepath), StandardCopyOption.REPLACE_EXISTING);
+                requestBody.put("attachmentPath", filepath);
+                requestBody.put("attachmentFilename", attachmentFile.getSubmittedFileName());
+                System.out.println("Attachment uploaded to: " + filepath);
+                System.out.println("Attachment filename: " + attachmentFile.getSubmittedFileName());
+            }
+            requestBody.put("content", messageContent);
+            requestBody.put("channelId", String.valueOf(dashboardNavigationState.getChannelId()));
+            requestBody.put("user_uid", sessionedUser.getUserUid());
+
+            HashMap<String, Object> response = sendMessageTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
+
+            if (response.get("success") != null) {
+                messageContent = ""; // Clear input after successful send
+                loadChannelMessages();
+                System.out.println(serverChannelMessages);// Refresh chat log
+            } else {
+                message = (String) response.get("message");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while sending message";
+        }
+        return null;
+    }
+    
+    public void deleteMessage(int messageId) {
+        System.out.println("Deleting message with ID: " + messageId);
+        try {
+            WebTarget deleteMessageTarget = base.path("serverchats/delete");
+
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("message_id", String.valueOf(messageId));
+
+            HashMap<String, Object> response = deleteMessageTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
+
+            if (response.get("message") != null) {
+                messageContent = ""; // Clear input after successful send
+                loadChannelMessages();; // Refresh chat log
+            } else {
+                message = (String) response.get("message");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while sending message";
+        }
+
+    }
+
+        public String loadServerMembers() {
+        try {
+                WebTarget serverMembersListTarget = base.path("servermembers/list");
+
+                HashMap<String, Object> requestBody = new HashMap<>();
+                requestBody.put("server_id", "" + dashboardNavigationState.getServerId());
+                System.out.println("Request Body: " + requestBody);
+
+                HashMap<String, Object> response = serverMembersListTarget
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(Entity.json(requestBody), HashMap.class);
+
+               if (response.get("servermembers") != null) {
+                   serverMembers.clear();
+                   System.out.println(response.get("servermembers"));
+                   //serverChat.setChannels((List<Channel>) response.get("channels"));
+                   serverMembers = (List<ServerMember>) response.get("servermembers");
+                   System.out.println(serverMembers);
+                }
+                else {
+                    message = (String) response.get("message");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = "Error occurred while creating server";
+            }
+            return null;
     }
 
     public ServerChat getServerChat() {
@@ -162,6 +300,13 @@ public class ServerChatBean implements Serializable {
     }
     public void setSessionedUser(SessionedUser sessionedUser) {
         this.sessionedUser = sessionedUser;
+    }
+
+    public List<ServerMember> getServerMembers() {
+        return serverMembers;
+    }
+    public void setServerMembers(List<ServerMember> serverMembers) {
+        this.serverMembers = serverMembers;
     }
 }
 

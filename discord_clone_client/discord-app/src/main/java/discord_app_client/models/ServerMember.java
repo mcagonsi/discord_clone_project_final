@@ -1,9 +1,9 @@
-package discord_rest_api.models;
+package discord_app_client.models;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class ServerMember implements Serializable{
+public class ServerMember implements Serializable {
     private User user;
     private List<Role> role;
 
