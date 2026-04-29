@@ -48,6 +48,8 @@ public class DirectChatBean implements Serializable {
     private String messageContent;
     private Part attachmentFile;
 
+    private String userToDM;
+
     @PostConstruct
     public void init() {
         client = ClientBuilder.newClient();
@@ -89,6 +91,65 @@ public class DirectChatBean implements Serializable {
             message = "Error occurred while fetching user info";
             return null;
         }
+    }
+
+    private void sendDM(String username) {
+        // Implementation for sending DM
+        System.out.println("Sending DM to user: " + username);
+        if (username == null || username.trim().isEmpty()) {
+            message = "Invalid user selected";
+            return;
+        }
+        try {
+            // Fetch the direct chat with this user
+            WebTarget directChatTarget = base.path("directchats/openorcreatedirectchat");
+            HashMap<String, Object> requestBody = new HashMap<>();
+            requestBody.put("other_user_username", username);
+            requestBody.put("user_uid", sessionedUser.getUserUid());
+
+            HashMap<String, Object> response = directChatTarget
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(requestBody), HashMap.class);
+
+            if (response.get("directChatId") != null) {
+                int directChatId = ((Number) response.get("directChatId")).intValue();
+                dashboardNavigationState.setDirectChatId(directChatId);
+                dashboardNavigationState.setMainContentPanel("chatPanel");
+                dashboardNavigationState.setSideBarPanel("DMs");
+                loadDirectChatMessages();
+                message = "";
+                return;
+            } else {
+                message = (String) response.get("message");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = "Error occurred while opening chat";
+        }
+    }
+    
+
+    public void dmUserbyUsername() {
+        if (userToDM == null || userToDM.trim().isEmpty()) {
+            message = "Please enter a username to send a DM";
+            return;
+        }
+        // Implementation for sending DM
+        sendDM(userToDM);
+    }
+
+    public void dmFromFriendList(String username) {
+        System.out.println("Sending DM to user from list: " + username);
+        if (username == null || username.trim().isEmpty()) {
+            message = "Invalid user selected";
+            return;
+        }
+
+        sendDM(username);
+    }
+    
+    public void testDirectMessageFromFriends() {
+        System.out.println("Testing direct message from friends...");
     }
 
     public String loadUsersDirectChats() {
@@ -281,6 +342,11 @@ public class DirectChatBean implements Serializable {
     public void setAttachmentFile(Part attachmentFile) {
         this.attachmentFile = attachmentFile;
     }
+    public String getUserToDM() {
+        return userToDM;
+    }
+    public void setUserToDM(String userToDM) {
+        this.userToDM = userToDM;
+    }
 }
-
 

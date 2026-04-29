@@ -18,7 +18,7 @@ import discord_app_client.utils.Variables;
 import jakarta.inject.Inject;
 
 @Named("authBean")
-@RequestScoped
+@SessionScoped
 public class AuthBean implements Serializable {
     @Inject
     private SessionedUser loggedUser;
