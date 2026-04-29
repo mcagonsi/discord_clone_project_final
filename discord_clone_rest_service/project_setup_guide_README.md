@@ -69,6 +69,8 @@ Notes and assumptions:
 - Open a browser and go to:
 	http://localhost:8080/discord-app/index.xhtml
 
+	Note: you might need to refresh a page for some actions done to see the effect
+
 ### 8) Troubleshooting checklist
 
 - Ensure MariaDB is running and accessible from the machine where TomEE runs.
@@ -81,3 +83,7 @@ Notes and assumptions:
 
 - The webapp expects a DataSource registered under a name (example used: `jdbc/DiscordClone`). If your code uses a different name, update the context.xml accordingly.
 - TomEE is used on localhost at default port 8080.
+
+
+### Expected Bugs or Features Missed
+- Some features are not working on the frontend because they are not connected to the frontend but if you go through the list of api setup you would find them there.

@@ -52,7 +52,7 @@
           action="#{serverBean.createServer}"
           styleClass="w-fit rounded-md bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
         >
-          <f:ajax execute="@form" render="createServerMessagePanel" />
+          <f:ajax execute="@form" render="createServerMessagePanel :serverRail" />
         </h:commandButton>
 
         <h:panelGroup id="createServerMessagePanel" layout="block">
