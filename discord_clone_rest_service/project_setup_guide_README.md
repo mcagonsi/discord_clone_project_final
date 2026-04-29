@@ -8,10 +8,13 @@ Follow these steps to get a local developer instance running and verify the data
 - Install a GUI client such as HeidiSQL and verify you can connect to the local MariaDB instance.
 - Load the database schema provided in the repository using the SQL file `discord_clone_db_creation.sql`.
 
-Example using the mysql/mariadb CLI from a Windows command prompt (adjust path to the SQL file):
-
-Notes:
-- If you use HeidiSQL, you can connect and run the SQL file from its Query tab instead of using the CLI.
+#### SQL Database Setup Notes
+- If you haven't before this point, copy the contents of the sql file (discord_clone_db_creation.sql) into a query in MariaDB and run it to create the database.
+- The database comes with 4 users, the first of which (admin) has sent 3 friend requests (2 accepted).
+- The password for all 4 is "Password1"
+- There are also two triggers:
+	- create_default_server_setup = automatically creates a "general" channel, "everyone" role, and add owner to server_members when a new server is created
+	- assign_everyone_role_after_member_insert = assigns all new members of a server the "everyone" role
 - Ensure the database (schema) was created and tables populated before continuing.
 
 ### 2) Install VS Code server extension
@@ -24,8 +27,6 @@ Notes:
 
 Link: https://www.apache.org/dyn/closer.cgi/tomee/tomee-10.1.4/apache-tomee-10.1.4-plus.zip
 
-
-
 ### 4) Add the JDBC Resource (context.xml)
 
 - The application expects a JNDI DataSource resource to be defined in the server's context. Add a <Resource> entry inside TomEE's `<Context>` element.
@@ -35,13 +36,13 @@ Link: https://www.apache.org/dyn/closer.cgi/tomee/tomee-10.1.4/apache-tomee-10.1
 Resource template (example) — paste inside `<Context> ... </Context>`:
 
 ```xml
-<Resource name="jdbc/DiscordDB"
+<Resource name="jdbc/DiscordClone"
 		  auth="Container"
 		  type="javax.sql.DataSource"
-		  username="YOUR_DB_USER"
+		  username="YOUR_DB_USERNAME"
 		  password="YOUR_DB_PASSWORD"
 		  driverClassName="org.mariadb.jdbc.Driver"
-		  url="jdbc:mariadb://localhost:3306/discord_clone_db"
+		  url="jdbc:mariadb://localhost:3306/discord_clone"
 		  maxTotal="20"
 		  maxIdle="10"
 		  maxWaitMillis="10000" />
@@ -54,35 +55,19 @@ Notes and assumptions:
 
 ### 5) Build the WAR
 
-- From the repository root, run the Gradle war task for the `app` module. On Windows (cmd.exe):
-
-```cmd
-cd "c:\Users\Michael\Documents\COURSE WORK\discord_clone_project_final"
-.\gradlew.bat :app:clean :app:war
-```
-
+- From the repository root, run the Gradle war task for both the front and back ends
 - After a successful build the WAR will be created under `app\build\libs\` (look for `*.war`).
 
 ### 6) Deploy the WAR to TomEE
 
-Option A — copy WAR to TomEE webapps (manual):
+- Run the war files on the server
 
-```cmd
-copy "app\build\libs\your-app.war" "C:\tools\apache-tomee-10.1.4-plus\webapps\"
-cd C:\tools\apache-tomee-10.1.4-plus\bin
-startup.bat
-```
+### 7) Open in browser
 
-Option B — use the VS Code Community Server extension UI to deploy the built WAR if it supports it (the extension should list your TomEE instance and provide deploy actions).
-
-### 7) Verify the app and DB connection
+- Start and full publish the server
 
 - Open a browser and go to:
-
-	http://localhost:8080/app/discord/permissions
-
-- Expected: the page should load and the data should be fetched from the MariaDB database.
-- If the page shows errors, check TomEE logs (`C:\tools\apache-tomee-10.1.4-plus\logs\catalina.out` or `logs` folder) for JDBC lookup errors.
+	http://localhost:8080/discord-app/index.xhtml
 
 ### 8) Troubleshooting checklist
 
@@ -94,9 +79,5 @@ Option B — use the VS Code Community Server extension UI to deploy the built W
 
 ### Assumptions made
 
-- The webapp expects a DataSource registered under a name (example used: `jdbc/DiscordDB`). If your code uses a different name, update the context.xml accordingly.
-- Gradle's `:app:war` task produces a deployable WAR in `app/build/libs/`.
+- The webapp expects a DataSource registered under a name (example used: `jdbc/DiscordClone`). If your code uses a different name, update the context.xml accordingly.
 - TomEE is used on localhost at default port 8080.
-
-
-
